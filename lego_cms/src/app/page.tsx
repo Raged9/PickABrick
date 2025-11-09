@@ -241,7 +241,7 @@ export default function Home() {
               See More »
             </Button>
           </div>
-          
+
           <Row className="g-4">
             {products.map((product) => (
               <Col key={product.id} lg={4} md={6}>
@@ -272,7 +272,7 @@ export default function Home() {
                       <span className="fw-bold fs-5">{product.price}</span>
                       <span className="text-muted">🧩 {product.pieces}</span>
                     </div>
-                    <Button variant="dark" className="w-100 rounded-3 fw-semibold">
+                    <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
                       View Details
                     </Button>
                   </Card.Body>

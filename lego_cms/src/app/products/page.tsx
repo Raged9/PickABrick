@@ -7,6 +7,7 @@ import { faShoppingCart, faSearch, faStar, faXmark } from '@fortawesome/free-sol
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faFacebook, faLinkedin, faTwitter, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Image from 'next/image';
+import Link from 'next/link';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function ProductsPage() {
@@ -231,7 +232,7 @@ export default function ProductsPage() {
                         <span className="fw-bold fs-5">{product.price}</span>
                         <span className="text-muted">🧩 {product.pieces}</span>
                       </div>
-                      <Button variant="dark" className="w-100 rounded-3 fw-semibold">
+                      <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
                         View Details
                       </Button>
                     </Card.Body>

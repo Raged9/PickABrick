@@ -17,7 +17,8 @@ export default function Home() {
       name: 'Classic Town Hall',
       price: 'Rp 1.299.000,00',
       pieces: '25 pcs',
-      image: '/images/products/product1.png'
+      image: '/images/products/product1.jpg',
+      category: 'Modular' // <-- Kategori ditambahkan
     },
     {
       id: 2,
@@ -25,15 +26,17 @@ export default function Home() {
       name: 'Minifigure Set Series 1',
       price: 'Rp 1.599.000,00',
       pieces: '12 pcs',
-      image: '/images/products/product2.png'
+      image: '/images/products/product2.jpg',
+      category: 'Minifigure' // <-- Kategori ditambahkan
     },
     {
       id: 3,
       sku: 'LEGO - 75432',
-      name: 'Lego Fun Shop',
+      name: 'Lego Pet Shop',
       price: 'Rp 2.399.000,00',
       pieces: '8 pcs',
-      image: '/images/products/product3.png'
+      image: '/images/products/product3.jpg',
+      category: 'City' // <-- Kategori ditambahkan
     },
     {
       id: 4,
@@ -41,7 +44,8 @@ export default function Home() {
       name: 'Lego Palace Cinema',
       price: 'Rp 1.299.000,00',
       pieces: '23 pcs',
-      image: '/images/products/product4.png'
+      image: '/images/products/product4.jpg',
+      category: 'Modular' // <-- Kategori ditambahkan
     },
     {
       id: 5,
@@ -49,7 +53,8 @@ export default function Home() {
       name: 'Lego Pet Shop',
       price: 'Rp 2.399.000,00',
       pieces: '8 pcs',
-      image: '/images/products/product5.png'
+      image: '/images/products/product3.jpg',
+      category: 'City' // <-- Kategori ditambahkan
     },
     {
       id: 6,
@@ -57,7 +62,8 @@ export default function Home() {
       name: 'Minifigure Set Series 1',
       price: 'Rp 1.599.000,00',
       pieces: '12 pcs',
-      image: '/images/products/product6.png'
+      image: '/images/products/product2.jpg',
+      category: 'Minifigure' // <-- Kategori ditambahkan
     }
   ];
 

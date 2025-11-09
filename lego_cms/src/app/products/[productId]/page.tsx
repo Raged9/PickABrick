@@ -15,15 +15,87 @@ import Link from 'next/link';
 
 // 3. "DATABASE" PRODUK ANDA (HARUS SAMA DENGAN DATABASE DI HALAMAN LAIN)
 const allProducts = [
-  { id: 1, sku: 'LEGO - 75432', name: 'Classic Town Hall', price: 'Rp 1.299.000,00', pieces: '25 pcs', image: '/images/products/product1.png', description: 'Body text for describing what this product is and why this product is simply a must-buy.' },
-  { id: 2, sku: 'LEGO - 75432', name: 'Minifigure Set Series 1', price: 'Rp 1.599.000,00', pieces: '12 pcs', image: '/images/products/product2.png', description: 'A wonderful series of minifigures to collect.' },
-  { id: 3, sku: 'LEGO - 75432', name: 'Lego Pet Shop', price: 'Rp 2.399.000,00', pieces: '8 pcs', image: '/images/products/product3.png', description: 'Build your own adorable pet shop, complete with animals.' },
-  { id: 4, sku: 'LEGO - 75432', name: 'Lego Palace Cinema', price: 'Rp 1.299.000,00', pieces: '23 pcs', image: '/images/products/product4.png', description: 'Recreate the magic of the movies with this classic cinema.' },
-  { id: 5, sku: 'LEGO - 75432', name: 'Lego Pet Shop', price: 'Rp 2.399.000,00', pieces: '8 pcs', image: '/images/products/product5.png', description: 'Another variant of the lovely pet shop.' },
-  { id: 6, sku: 'LEGO - 75432', name: 'Minifigure Set Series 1', price: 'Rp 1.599.000,00', pieces: '12 pcs', image: '/images/products/product6.png', description: 'Continue your collection with Series 1.' },
-  { id: 7, sku: 'LEGO - 75432', name: 'Classic Town Hall', price: 'Rp 1.299.000,00', pieces: '25 pcs', image: '/images/products/product1.png', description: 'Body text for describing what this product is and why this product is simply a must-buy.' },
-  { id: 8, sku: 'LEGO - 75432', name: 'Minifigure Set Series 1', price: 'Rp 1.599.000,00', pieces: '12 pcs', image: '/images/products/product2.png', description: 'A wonderful series of minifigures to collect.' },
-  { id: 9, sku: 'LEGO - 75432', name: 'Lego Pet Shop', price: 'Rp 2.399.000,00', pieces: '8 pcs', image: '/images/products/product3.png', description: 'Build your own adorable pet shop, complete with animals.' },
+   {
+    id: 1,
+    sku: 'LEGO - 75432',
+    name: 'Classic Town Hall',
+    price: 'Rp 1.299.000,00',
+    pieces: '25 pcs',
+    image: '/images/products/product1.jpg',
+    category: 'Modular' // <-- Kategori ditambahkan
+  },
+  {
+    id: 2,
+    sku: 'LEGO - 75432',
+    name: 'Minifigure Set Series 1',
+    price: 'Rp 1.599.000,00',
+    pieces: '12 pcs',
+    image: '/images/products/product2.jpg',
+    category: 'Minifigure' // <-- Kategori ditambahkan
+  },
+  {
+    id: 3,
+    sku: 'LEGO - 75432',
+    name: 'Lego Pet Shop',
+    price: 'Rp 2.399.000,00',
+    pieces: '8 pcs',
+    image: '/images/products/product3.jpg',
+    category: 'City' // <-- Kategori ditambahkan
+  },
+  {
+    id: 4,
+    sku: 'LEGO - 75432',
+    name: 'Lego Palace Cinema',
+    price: 'Rp 1.299.000,00',
+    pieces: '23 pcs',
+    image: '/images/products/product4.jpg',
+    category: 'Modular' // <-- Kategori ditambahkan
+  },
+  {
+    id: 5,
+    sku: 'LEGO - 75432',
+    name: 'Lego Pet Shop',
+    price: 'Rp 2.399.000,00',
+    pieces: '8 pcs',
+    image: '/images/products/product3.jpg',
+    category: 'City' // <-- Kategori ditambahkan
+  },
+  {
+    id: 6,
+    sku: 'LEGO - 75432',
+    name: 'Minifigure Set Series 1',
+    price: 'Rp 1.599.000,00',
+    pieces: '12 pcs',
+    image: '/images/products/product2.jpg',
+    category: 'Minifigure' // <-- Kategori ditambahkan
+  },
+  {
+    id: 7,
+    sku: 'LEGO - 75432',
+    name: 'Classic Town Hall',
+    price: 'Rp 1.299.000,00',
+    pieces: '25 pcs',
+    image: '/images/products/product1.jpg',
+    category: 'Modular' // <-- Kategori ditambahkan
+  },
+  {
+    id: 8,
+    sku: 'LEGO - 75432',
+    name: 'Minifigure Set Series 1',
+    price: 'Rp 1.599.000,00',
+    pieces: '12 pcs',
+    image: '/images/products/product2.jpg',
+    category: 'Minifigure' // <-- Kategori ditambahkan
+  },
+  {
+    id: 9,
+    sku: 'LEGO - 75432',
+    name: 'Lego Pet Shop',
+    price: 'Rp 2.399.000,00',
+    pieces: '8 pcs',
+    image: '/images/products/product3.jpg',
+    category: 'City' // <-- Kategori ditambahkan
+  },
 ];
 
 export default function ProductDetailPage() {

@@ -6,6 +6,7 @@ import { faShoppingCart, faSearch, faBox, faChartLine, faStar, faXmark } from '@
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faFacebook, faLinkedin, faTwitter, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Image from 'next/image';
+import Link from 'next/link';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Home() {
@@ -236,7 +237,7 @@ export default function Home() {
               <h5 className="fw-bold">Newest Stock Arrivals</h5>
               <p className="text-muted mb-0">Latest LEGO Products in our inventory</p>
             </div>
-            <Button className="btn-yellow fw-semibold rounded-pill px-4">
+            <Button as={Link} href="/products" className="btn-yellow fw-semibold rounded-pill px-4">
               See More »
             </Button>
           </div>

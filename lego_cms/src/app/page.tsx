@@ -1,75 +1,29 @@
 'use client';
 
-import { Container, Row, Col, Card, Button, Form, InputGroup, Badge } from 'react-bootstrap';
+// Import HANYA yang diperlukan untuk halaman ini
+import { Container, Row, Col, Card, Button, Form, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faBox, faChartLine, faStar } from '@fortawesome/free-solid-svg-icons';
-import { faHeart } from '@fortawesome/free-regular-svg-icons';
+import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons'; // (1. BARU) Hati penuh
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'; // (2. MODIFIKASI) Ganti nama
 import Image from 'next/image';
 import Link from 'next/link';
 
+// (3. BARU) Import hook 'useFavorites' dan data produk
+import { useFavorites } from './contexts/FavoritesContext';
+import { allProducts } from '../data/products';
+
+
 export default function Home() {
-  const products = [
-    {
-      id: 1,
-      sku: 'LEGO - 75432',
-      name: 'Classic Town Hall',
-      price: 'Rp 1.299.000,00',
-      pieces: '25 pcs',
-      image: '/images/products/product1.jpg',
-      category: 'Modular'
-    },
-    {
-      id: 2,
-      sku: 'LEGO - 75432',
-      name: 'Minifigure Set Series 1',
-      price: 'Rp 1.599.000,00',
-      pieces: '12 pcs',
-      image: '/images/products/product2.jpg',
-      category: 'Minifigure'
-    },
-    {
-      id: 3,
-      sku: 'LEGO - 75432',
-      name: 'Lego Pet Shop',
-      price: 'Rp 2.399.000,00',
-      pieces: '8 pcs',
-      image: '/images/products/product3.jpg',
-      category: 'City'
-    },
-    {
-      id: 4,
-      sku: 'LEGO - 75432',
-      name: 'Lego Palace Cinema',
-      price: 'Rp 1.299.000,00',
-      pieces: '23 pcs',
-      image: '/images/products/product4.jpg',
-      category: 'Modular'
-    },
-    {
-      id: 5,
-      sku: 'LEGO - 75432',
-      name: 'Lego Pet Shop',
-      price: 'Rp 2.399.000,00',
-      pieces: '8 pcs',
-      image: '/images/products/product3.jpg',
-      category: 'City'
-    },
-    {
-      id: 6,
-      sku: 'LEGO - 75432',
-      name: 'Minifigure Set Series 1',
-      price: 'Rp 1.599.000,00',
-      pieces: '12 pcs',
-      image: '/images/products/product2.jpg',
-      category: 'Minifigure'
-    }
-  ];
+  
+  // (4. BARU) Ambil data dan fungsi dari context
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  
+  // Ambil 6 produk pertama untuk homepage
+  const products = allProducts.slice(0, 6);
 
   return (
     <>
-      {/* Hapus: <style jsx global> */}
-      {/* Hapus: <Navbar> */}
-
       {/* Hero Section */}
       <section className="hero-section text-white py-5">
         <Container className="py-5 hero-content">
@@ -148,42 +102,65 @@ export default function Home() {
           </div>
 
           <Row className="g-4">
-            {products.map((product) => (
-              <Col key={product.id} lg={4} md={6}>
-                <Card className="border-0 shadow-sm h-100">
-                  <div className="position-relative product-image-wrapper">
-                    <Image 
-                      src={product.image} 
-                      alt={product.name}
-                      fill
-                      style={{objectFit: 'contain', padding: '20px'}}
-                      onError={(e) => {
-                        e.currentTarget.src = '/images/placeholder-product.png';
-                      }}
-                    />
-                    <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
-                      <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
-                        <FontAwesomeIcon icon={faHeart} size="sm" />
-                      </Button>
-                      <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
-                        <FontAwesomeIcon icon={faShoppingCart} size="sm" />
-                      </Button>
+            {products.map((product) => {
+              // (5. BARU) Cek status favorit untuk setiap produk
+              const isFav = isFavorite(product.id);
+
+              return (
+                <Col key={product.id} lg={4} md={6}>
+                  <Card className="border-0 shadow-sm h-100">
+                    <div className="position-relative product-image-wrapper">
+                      <Image 
+                        src={product.image} 
+                        alt={product.name}
+                        fill
+                        style={{objectFit: 'contain', padding: '20px'}}
+                        onError={(e) => {
+                          e.currentTarget.src = '/images/placeholder-product.png';
+                        }}
+                      />
+                      <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                        
+                        {/* (6. DIUBAH) Tombol Hati yang sudah berfungsi */}
+                        <Button 
+                          variant="light" 
+                          className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
+                          style={{width: '35px', height: '35px'}}
+                          onClick={() => {
+                            if (isFav) {
+                              removeFavorite(product.id);
+                            } else {
+                              addFavorite(product);
+                            }
+                          }}
+                        >
+                          <FontAwesomeIcon 
+                            icon={isFav ? faHeartSolid : faHeartRegular} 
+                            size="sm" 
+                            color={isFav ? 'red' : 'inherit'} 
+                          />
+                        </Button>
+
+                        <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
+                          <FontAwesomeIcon icon={faShoppingCart} size="sm" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  <Card.Body>
-                    <p className="text-muted small mb-2">SKU : {product.sku}</p>
-                    <Card.Title className="fw-bold mb-3">{product.name}</Card.Title>
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <span className="fw-bold fs-5">{product.price}</span>
-                      <span className="text-muted">🧩 {product.pieces}</span>
-                    </div>
-                    <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
-                      View Details
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
+                    <Card.Body>
+                      <p className="text-muted small mb-2">SKU : {product.sku}</p>
+                      <Card.Title className="fw-bold mb-3">{product.name}</Card.Title>
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        <span className="fw-bold fs-5">{product.price}</span>
+                        <span className="text-muted">🧩 {product.pieces}</span>
+                      </div>
+                      <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
+                        View Details
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              );
+            })}
           </Row>
         </Container>
       </section>
@@ -252,8 +229,6 @@ export default function Home() {
           </div>
         </Container>
       </section>
-
-      {/* Hapus: <Footer> */}
     </>
   );
-}
+} 

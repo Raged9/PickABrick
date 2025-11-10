@@ -1,119 +1,30 @@
 'use client';
 
-// =====================================================================
-// 1. IMPORT (Sudah dibersihkan)
-// =====================================================================
 import { Container, Row, Col, Card, Button, Navbar, Nav, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons';
-import { faHeart } from '@fortawesome/free-regular-svg-icons';
+import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-// Hapus: 'bootstrap/dist/css/bootstrap.min.css' (sudah di layout)
-// Hapus: import Form, InputGroup, faSearch, faXmark, faFacebook, dll.
 
-// =====================================================================
-// 2. DATA PRODUK & KATEGORI
-// =====================================================================
+// (1. PERBAIKAN) Path yang benar adalah '../' (naik satu level)
+import { useFavorites } from '../contexts/FavoritesContext';
+import { allProducts } from '../../data/products';
+
 
 const categories = ["All", "Minifigure", "Super-Heroes", "City", "Friends", "Harry Potter", "Modular"];
 
-const allProducts = [
-  {
-    id: 1,
-    sku: 'LEGO - 75432',
-    name: 'Classic Town Hall',
-    price: 'Rp 1.299.000,00',
-    pieces: '25 pcs',
-    image: '/images/products/product1.jpg',
-    category: 'Modular'
-  },
-  {
-    id: 2,
-    sku: 'LEGO - 75432',
-    name: 'Minifigure Set Series 1',
-    price: 'Rp 1.599.000,00',
-    pieces: '12 pcs',
-    image: '/images/products/product2.jpg',
-    category: 'Minifigure'
-  },
-  {
-    id: 3,
-    sku: 'LEGO - 75432',
-    name: 'Lego Pet Shop',
-    price: 'Rp 2.399.000,00',
-    pieces: '8 pcs',
-    image: '/images/products/product3.jpg',
-    category: 'City'
-  },
-  {
-    id: 4,
-    sku: 'LEGO - 75432',
-    name: 'Lego Palace Cinema',
-    price: 'Rp 1.299.000,00',
-    pieces: '23 pcs',
-    image: '/images/products/product4.jpg',
-    category: 'Modular'
-  },
-  {
-    id: 5,
-    sku: 'LEGO - 75432',
-    name: 'Lego Pet Shop',
-    price: 'Rp 2.399.000,00',
-    pieces: '8 pcs',
-    image: '/images/products/product3.jpg',
-    category: 'City'
-  },
-  {
-    id: 6,
-    sku: 'LEGO - 75432',
-    name: 'Minifigure Set Series 1',
-    price: 'Rp 1.599.000,00',
-    pieces: '12 pcs',
-    image: '/images/products/product2.jpg',
-    category: 'Minifigure'
-  },
-  {
-    id: 7,
-    sku: 'LEGO - 75432',
-    name: 'Classic Town Hall',
-    price: 'Rp 1.299.000,00',
-    pieces: '25 pcs',
-    image: '/images/products/product1.jpg',
-    category: 'Modular'
-  },
-  {
-    id: 8,
-    sku: 'LEGO - 75432',
-    name: 'Minifigure Set Series 1',
-    price: 'Rp 1.599.000,00',
-    pieces: '12 pcs',
-    image: '/images/products/product2.jpg',
-    category: 'Minifigure'
-  },
-  {
-    id: 9,
-    sku: 'LEGO - 75432',
-    name: 'Lego Pet Shop',
-    price: 'Rp 2.399.000,00',
-    pieces: '8 pcs',
-    image: '/images/products/product3.jpg',
-    category: 'City'
-  },
-];
-
-
-// =====================================================================
-// 3. KOMPONEN HALAMAN
-// =====================================================================
 export default function ProductsPage() {
   
   const [selectedCategory, setSelectedCategory] = useState('All');
+  
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   const filteredProducts = allProducts.filter(product => {
     if (selectedCategory === 'All') {
-      return true;
+      return true; 
     }
     return product.category === selectedCategory;
   });
@@ -121,12 +32,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      {/* Hapus: <style jsx global> */}
-      {/* Hapus: Main <Navbar> */}
-
-      {/* =============================================================== */}
-      {/* 6. FILTER BAR (INI TETAP ADA) */}
-      {/* =============================================================== */}
+      {/* FILTER BAR */}
       <Navbar bg="light" variant="light" className="shadow-sm py-0" style={{ borderBottom: '1px solid #dee2e6' }}>
         <Container>
           <Nav className="flex-wrap">
@@ -145,9 +51,7 @@ export default function ProductsPage() {
         </Container>
       </Navbar>
 
-      {/* =============================================================== */}
-      {/* 7. KONTEN UTAMA HALAMAN */}
-      {/* =============================================================== */}
+      {/* KONTEN UTAMA HALAMAN */}
       <main>
         {/* Products Section (Konten Utama) */}
         <section className="py-5" id="products">
@@ -158,42 +62,63 @@ export default function ProductsPage() {
               
               {filteredProducts.length > 0 ? (
                 
-                filteredProducts.map((product) => (
-                  <Col key={product.id} lg={4} md={6}>
-                    <Card className="border-0 shadow-sm h-100">
-                      <div className="position-relative product-image-wrapper">
-                        <Image 
-                          src={product.image || '/images/placeholder-product.png'}
-                          alt={product.name}
-                          fill
-                          style={{objectFit: 'contain', padding: '20px'}}
-                          onError={(e) => {
-                            e.currentTarget.src = '/images/placeholder-product.png';
-                          }}
-                        />
-                        <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
-                          <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
-                            <FontAwesomeIcon icon={faHeart} size="sm" />
-                          </Button>
-                          <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
-                            <FontAwesomeIcon icon={faShoppingCart} size="sm" />
-                          </Button>
+                filteredProducts.map((product) => {
+                  const isFav = isFavorite(product.id);
+
+                  return (
+                    <Col key={product.id} lg={4} md={6}>
+                      <Card className="border-0 shadow-sm h-100">
+                        <div className="position-relative product-image-wrapper">
+                          <Image 
+                            src={product.image || '/images/placeholder-product.png'}
+                            alt={product.name}
+                            fill
+                            style={{objectFit: 'contain', padding: '20px'}}
+                            onError={(e) => {
+                              e.currentTarget.src = '/images/placeholder-product.png';
+                            }}
+                          />
+                          <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                            
+                            <Button 
+                              variant="light" 
+                              className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
+                              style={{width: '35px', height: '35px'}}
+                              onClick={() => {
+                                if (isFav) {
+                                  removeFavorite(product.id);
+                                } else {
+                                  addFavorite(product);
+                                }
+                              }}
+                            >
+                              <FontAwesomeIcon 
+                                icon={isFav ? faHeartSolid : faHeartRegular} 
+                                size="sm" 
+                                color={isFav ? 'red' : 'inherit'} 
+                              />
+                            </Button>
+
+                            <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
+                              <FontAwesomeIcon icon={faShoppingCart} size="sm" />
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                      <Card.Body>
-                        <p className="text-muted small mb-2">SKU : {product.sku}</p>
-                        <Card.Title className="fw-bold mb-3">{product.name}</Card.Title>
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                          <span className="fw-bold fs-5">{product.price}</span>
-                          <span className="text-muted">🧩 {product.pieces}</span>
-                        </div>
-                        <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
-                          View Details
-                        </Button>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                ))
+                        <Card.Body>
+                          <p className="text-muted small mb-2">SKU : {product.sku}</p>
+                          <Card.Title className="fw-bold mb-3">{product.name}</Card.Title>
+                          <div className="d-flex justify-content-between align-items-center mb-3">
+                            <span className="fw-bold fs-5">{product.price}</span>
+                            <span className="text-muted">🧩 {product.pieces}</span>
+                          </div>
+                          <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
+                            View Details
+                          </Button>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  );
+                }) 
               ) : (
                 <Col className="text-center py-5">
                   <h4 className='text-muted'>No products found for "{selectedCategory}".</h4>
@@ -255,8 +180,6 @@ export default function ProductsPage() {
           </Container>
         </section>
       </main>
-      
-      {/* Hapus: <Footer> */}
     </>
   );
 }

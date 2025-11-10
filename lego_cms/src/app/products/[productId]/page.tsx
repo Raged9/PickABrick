@@ -1,17 +1,13 @@
 'use client';
 
-// 1. IMPORT (Dibersihkan)
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
-// Hapus: 'bootstrap/dist/css/bootstrap.min.css' (sudah di layout)
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-// Hapus: import Navbar, Nav, Form, InputGroup, faSearch, faXmark, faFacebook, dll.
 
-// 3. "DATABASE" PRODUK
 const allProducts = [
   {
     id: 1,
@@ -122,16 +118,11 @@ export default function ProductDetailPage() {
 
   return (
     <>
-      {/* Hapus: <style jsx global> */}
-      {/* Hapus: <Navbar> */}
-
-      {/* 8. KONTEN UTAMA HALAMAN INI */}
       <main>
         <section className="py-5">
           <Container>
             <p className="text-muted mb-4">Product detail page</p>
             <Row className="g-5">
-              {/* KOLOM KIRI: GAMBAR */}
               <Col lg={7}>
                 <div className="detail-image-wrapper">
                   <Image 
@@ -144,7 +135,6 @@ export default function ProductDetailPage() {
                 </div>
               </Col>
               
-              {/* KOLOM KANAN: DETAIL INFO */}
               <Col lg={5}>
                 <h1 className="fw-bold">{product.name}</h1>
                 <p className="text-muted">Subheading (SKU: {product.sku})</p>
@@ -165,7 +155,6 @@ export default function ProductDetailPage() {
           </Container>
         </section>
 
-        {/* 9. BAGIAN "SEE OTHER PRODUCTS" */}
         <section className="py-5 bg-light">
           <Container>
             <h3 className="fw-bold mb-4">See Other Products</h3>
@@ -199,8 +188,6 @@ export default function ProductDetailPage() {
           </Container>
         </section>
       </main>
-      
-      {/* Hapus: <Footer> */}
     </>
-  );
+  ); 
 }

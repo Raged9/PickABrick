@@ -1,11 +1,11 @@
 'use client';
- 
+
 // Import yang diperlukan
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons'; // Hati penuh
-import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'; // Hati kosong
+// (DIHAPUS) faShoppingCart dihapus dari import ini
+import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons'; 
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -69,9 +69,8 @@ export default function FavoritesPage() {
                               />
                             </Button>
 
-                            <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
-                              <FontAwesomeIcon icon={faShoppingCart} size="sm" />
-                            </Button>
+                            {/* KODE TOMBOL CART DIHAPUS DARI SINI */}
+                            
                           </div>
                         </div>
                         <Card.Body>

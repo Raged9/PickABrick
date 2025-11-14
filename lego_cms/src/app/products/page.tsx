@@ -2,14 +2,14 @@
 
 import { Container, Row, Col, Card, Button, Navbar, Nav, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faStar } from '@fortawesome/free-solid-svg-icons';
+// (DIHAPUS) faShoppingCart dihapus dari import ini
+import { faStar } from '@fortawesome/free-solid-svg-icons'; 
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-// (1. PERBAIKAN) Path yang benar adalah '../' (naik satu level)
 import { useFavorites } from '../contexts/FavoritesContext';
 import { allProducts } from '../../data/products';
 
@@ -99,9 +99,8 @@ export default function ProductsPage() {
                               />
                             </Button>
 
-                            <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
-                              <FontAwesomeIcon icon={faShoppingCart} size="sm" />
-                            </Button>
+                            {/* KODE TOMBOL CART DIHAPUS DARI SINI */}
+
                           </div>
                         </div>
                         <Card.Body>
@@ -124,58 +123,6 @@ export default function ProductsPage() {
                   <h4 className='text-muted'>No products found for "{selectedCategory}".</h4>
                 </Col>
               )}
-            </Row>
-          </Container>
-        </section>
-
-        {/* Filler Text Section */}
-        <section className='py-5 bg-light'>
-          <Container>
-              <Row className='justify-content-center'>
-                  <Col lg={8}>
-                      <p className='text-muted'>
-                        Excepteur efficient emerging, minim veniam enim slaying non carefully curated gauche. Vaporware fixie unicorn, blog trust fund deep v taxidermy. Enamel pin poke kogi, lo-fi aesthetic lovely tumblr quinoa tumeric. Exclusive ipsum charting Quezon City, musculature sunt artisan pork belly. Subway tile semiotics, locavore typewriter excepteur trust fund eu non fingerstache vape.
-                      </p>
-                      <p className='text-muted'>
-                        Deserunt polaroid, direct trade iceland cutting-edge laborum deserunt esse lorem. Cupidatat id est, sharp classic his best, commodo nostrud delightful. Convivial wine selfies, DIY whatever post-ironic chartreuse retro. Flexitarian four dollar toast, listicle goch_ujang culpa.
-                      </p>
-                  </Col>
-              </Row>
-          </Container>
-        </section>
-
-        {/* Discount and Promo Section */}
-        <section className="py-5">
-          <Container className="py-4">
-            <h2 className="fw-bold mb-5">Discount and Promo</h2>
-            <Row className="g-4">
-              <Col md={4}>
-                <Card className='border-0'>
-                  <Image src="/images/promo/promo1.png" alt="Promo 1" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
-                  <Card.Body className='px-0'>
-                    <Card.Title className='fw-semibold'>Title</Card.Title>
-                    <Card.Text className='text-muted'>SLUG co</Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={4}>
-                  <Card className='border-0'>
-                  <Image src="/images/promo/promo2.png" alt="Promo 2" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
-                  <Card.Body className='px-0'>
-                    <Card.Title className='fw-semibold'>Title</Card.Title>
-                    <Card.Text className='text-muted'>SLUG co</Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={4}>
-                  <Card className='border-0'>
-                  <Image src="/images/promo/promo3.png" alt="Promo 3" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
-                  <Card.Body className='px-0'>
-                    <Card.Title className='fw-semibold'>Title</Card.Title>
-                    <Card.Text className='text-muted'>SLUG co</Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
             </Row>
           </Container>
         </section>

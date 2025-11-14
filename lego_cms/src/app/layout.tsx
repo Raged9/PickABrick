@@ -50,7 +50,7 @@ export default function RootLayout({
               color: #000;
             }
             .hero-section {
-              min-height: 100vh;
+              min-height: 880px; 
               background-image: url('/images/hero-logo.jpg');
               background-size: cover;
               background-position: center;
@@ -133,15 +133,23 @@ export default function RootLayout({
                     <FontAwesomeIcon icon={faHeart} />
                   </Button>
                   
-                  <div className="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px', minWidth: '32px', minHeight: '32px', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', cursor: 'pointer', backgroundColor: 'white'}}>
-                    <Image 
-                      src="/images/profile.png" 
-                      alt="Profile" 
-                      width={22} 
-                      height={22}
-                      style={{objectFit: 'cover', borderRadius: '50%'}}
-                    />
-                  </div>
+                  {/* ========================================================== */}
+                  {/* (INI BAGIAN YANG DIUBAH)                                   */}
+                  {/* ========================================================== */}
+                  <Link href="/profile">
+                    <div className="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px', minWidth: '32px', minHeight: '32px', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', cursor: 'pointer', backgroundColor: 'white'}}>
+                      <Image 
+                        src="/images/profile.png" 
+                        alt="Profile" 
+                        width={22} 
+                        height={22}
+                        style={{objectFit: 'cover', borderRadius: '50%'}}
+                      />
+                    </div>
+                  </Link>
+                  {/* ========================================================== */}
+                  {/* (AKHIR PERUBAHAN)                                        */}
+                  {/* ========================================================== */}
                 </div>
               </Navbar.Collapse>
             </Container>
@@ -206,7 +214,7 @@ export default function RootLayout({
             </Container>
           </footer>
         
-        </FavoritesProvider> {/* (4. BARU) Tutup Provider */}
+        </FavoritesProvider>
       </body>
     </html>
   );

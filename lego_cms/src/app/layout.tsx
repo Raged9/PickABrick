@@ -2,13 +2,18 @@
 
 import './globals.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Row, Col, Button, Navbar, Nav, Form, InputGroup } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Container, Row, Col, Button, Navbar, Nav, Form, InputGroup, Modal, CloseButton } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faSearch, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faFacebook, faLinkedin, faTwitter, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
+
+const yellowBrickImg = '/images/studs.png';
+const redBrickImg = '/images/brickclean.png';
+const minifigureImg = '/images/legoman.png';
 
 // (1. BARU) Import Provider Favorit Anda
 import { FavoritesProvider } from './contexts/FavoritesContext';
@@ -18,6 +23,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const handleCloseLoginModal = () => setShowLoginModal(false);
+  const handleShowLoginModal = () => setShowLoginModal(true);
+
   return (
     <html lang="en">
       <head>
@@ -30,64 +40,7 @@ export default function RootLayout({
 
           {/* Style Global */}
           <style jsx global>{`
-            .bg-yellow {
-              background-color: #FDB913 !important;
-            }
-            .bg-navy {
-              background-color: #1a1a4d !important;
-            }
-            .text-navy {
-              color: #1a1a4d !important;
-            }
-            .btn-yellow {
-              background-color: #FDB913;
-              border-color: #FDB913;
-              color: #000;
-            }
-            .btn-yellow:hover {
-              background-color: #e5a711;
-              border-color: #e5a711;
-              color: #000;
-            }
-            .hero-section {
-              min-height: 100vh;
-              background-image: url('/images/hero-logo.jpg');
-              background-size: cover;
-              background-position: center;
-              background-repeat: no-repeat;
-              position: relative;
-              display: flex;
-              align-items: center;
-            }
-            .hero-section::before {
-              content: '';
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              background-color: rgba(0,0,0,0.3);
-              z-index: 0;
-            }
-            .hero-content {
-              position: relative;
-              z-index: 1;
-              width: 100%;
-            }
-            .product-image-wrapper {
-              position: relative;
-              width: 100%;
-              height: 250px;
-              background: #f5f5ff;
-            }
-            .detail-image-wrapper {
-              position: relative;
-              width: 100%;
-              min-height: 400px;
-              background: #f8f9fa;
-              border-radius: 0.375rem;
-              overflow: hidden;
-            }
+
           `}</style>
 
           {/* Navbar */}
@@ -128,20 +81,33 @@ export default function RootLayout({
                     </Button>
                   </InputGroup>
                   
-                  {/* (3. MODIFIKASI) Tombol hati di Navbar sekarang link ke halaman favorit */}
+                  {/* (MODIFIKASI) Tombol hati diperbaiki dengan <Link> membungkus <Button as="a"> */}
                   <Button as={Link} href="/favorites" variant="light" className="d-flex align-items-center justify-content-center shadow-sm" style={{width: '32px', height: '32px', borderRadius: '50%'}}>
                     <FontAwesomeIcon icon={faHeart} />
                   </Button>
                   
-                  <div className="rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style={{width: '32px', height: '32px', minWidth: '32px', minHeight: '32px', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', cursor: 'pointer', backgroundColor: 'white'}}>
+                  {/* (MODIFIKASI) Div profil diubah jadi Button yang membuka modal */}
+                  <Button 
+                    variant="light"
+                    onClick={handleShowLoginModal}
+                    className="rounded-circle d-flex align-items-center justify-content-center"
+                    style={{
+                      width: '32px', 
+                      height: '32px', 
+                      minWidth: '32px', 
+                      minHeight: '32px', 
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+                      overflow: 'hidden'
+                    }}
+                  >
                     <Image 
                       src="/images/profile.png" 
                       alt="Profile" 
-                      width={22} 
+                      width={22}
                       height={22}
                       style={{objectFit: 'cover', borderRadius: '50%'}}
                     />
-                  </div>
+                  </Button>
                 </div>
               </Navbar.Collapse>
             </Container>
@@ -204,6 +170,101 @@ export default function RootLayout({
               <hr className="my-4 bg-white opacity-25" />
               <p className="text-center text-white-50 mb-0">© 2024 Pick A Brick. All rights reserved.</p>
             </Container>
+            {/* (BARU) Modal Login diletakkan di sini */}
+            <Modal
+              show={showLoginModal}
+              onHide={handleCloseLoginModal}
+              centered
+              dialogClassName="rounded-4"
+              contentClassName="border-0 rounded-4"
+            >
+              <Modal.Body 
+                className="p-4 p-md-5 position-relative"
+                style={{ 
+                  overflow: 'hidden',
+                  minHeight: '500px',
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}
+
+              >
+                <CloseButton 
+                  onClick={handleCloseLoginModal}
+                  className="position-absolute"
+                  style={{ top: '20px', right: '20px', zIndex: 10 }}
+                />
+                
+                {/* === GAMBAR DEKORATIF MODAL === */}
+                <Image
+                  src={yellowBrickImg}
+                  alt="Yellow brick"
+                  width={80}
+                  height={80}
+                  className="position-absolute d-none d-md-block"
+                  style={{ top: '5%', left: '5%', zIndex: 1, transform: 'rotate(-15deg)' }}
+                />
+                <Image
+                  src={redBrickImg}
+                  alt="Red brick"
+                  width={150}
+                  height={90}
+                  className="position-absolute d-none d-md-block"
+                  style={{ bottom: '0%', left: '0%', zIndex: 1, transform: 'translateX(-20%)' }}
+                />
+                <Image
+                  src={minifigureImg}
+                  alt="Minifigure"
+                  width={180}
+                  height={260}
+                  className="position-absolute d-none d-md-block"
+                  style={{ bottom: '0%', right: '0%', zIndex: 1, transform: 'translateX(15%)' }}
+                />
+
+                {/* === KONTEN MODAL === */}
+                <Container fluid style={{ zIndex: 2, position: 'relative' }}>
+                  <Row className="justify-content-center text-center">
+                    <Col xs={12}>
+                      {/* Logo (Menggunakan logo dari Navbar Anda) */}
+                      <Image 
+                        src="/images/logo.png" 
+                        alt="Pick A Brick Logo" 
+                        width={100} 
+                        height={100}
+                        style={{objectFit: 'contain'}}
+                      />
+                    </Col>
+                    
+                    <Col xs={12} className="mt-4">
+                      <h4 className="fw-bold">Sign in to your Pick A Brick Account</h4>
+                    </Col>
+                    
+                    <Col xs={12} md={10} className="mt-4">
+                      {/* Tombol Sign In */}
+                      <Button 
+                        as={Link} 
+                        href="/login" 
+                        variant="primary"
+                        className="w-100 rounded-pill fw-semibold"
+                        style={{ padding: '0.75rem', fontSize: '1.1rem', backgroundColor: '#4A69E2', borderColor: '#4A69E2' }}
+                        onClick={handleCloseLoginModal}
+                      >
+                        Sign In
+                      </Button>
+                    </Col>
+                    
+                    <Col xs={12} className="mt-4">
+                      <p className="mb-0">
+                        Don't have an account?{' '}
+                        <Link href="/register" onClick={handleCloseLoginModal} className="fw-bold" style={{ textDecoration: 'none' }}>
+                          Register
+                        </Link>
+                      </p>
+                    </Col>
+                  </Row>
+                </Container>
+
+              </Modal.Body>
+            </Modal>
           </footer>
         
         </FavoritesProvider> {/* (4. BARU) Tutup Provider */}

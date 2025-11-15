@@ -219,7 +219,7 @@ export default function Home() {
           <div className="d-flex justify-content-center gap-3 flex-wrap">
             <Form.Control 
               type="email" 
-              placeholder="Enter your email" 
+              placeholder="Enter your email here..." 
               className="rounded-3"
               style={{maxWidth: '400px'}} 
             />

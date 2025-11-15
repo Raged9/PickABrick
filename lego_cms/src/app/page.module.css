@@ -16,6 +16,17 @@
   font-family: var(--font-geist-sans);
 }
 
+.btn-yellow {
+  background-color: #FDB913;
+  border-color: #FDB913;
+  color: #000;
+}
+.btn-yellow:hover {
+  background-color: #e5a711;
+  border-color: #e5a711;
+  color: #000;
+}
+
 @media (prefers-color-scheme: dark) {
   .page {
     --gray-rgb: 255, 255, 255;

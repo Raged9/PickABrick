@@ -1,0 +1,24 @@
+/* src/app/promo/[slug]/PromoArticle.module.css */
+
+.articleContainer {
+  /* Halaman artikel akan punya layout header/footer dari layout.tsx */
+  /* jadi kita hanya perlu fokus pada kontennya. */
+  background-color: #ffffff; /* Latar belakang putih untuk artikel */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.articleContent p {
+  line-height: 1.7;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.articleContent ul {
+  line-height: 1.7;
+  font-size: 1.1rem;
+  padding-left: 2rem;
+  color: #333;
+}

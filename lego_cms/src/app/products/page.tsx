@@ -150,31 +150,45 @@ export default function ProductsPage() {
             <h2 className="fw-bold mb-5">Discount and Promo</h2>
             <Row className="g-4">
               <Col md={4}>
-                <Card className='border-0'>
-                  <Image src="/images/promo/promo1.png" alt="Promo 1" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
-                  <Card.Body className='px-0'>
-                    <Card.Title className='fw-semibold'>Title</Card.Title>
-                    <Card.Text className='text-muted'>SLUG co</Card.Text>
-                  </Card.Body>
-                </Card>
+                <Link href="/promo/year-end-sale" passHref legacyBehavior>
+                  <a className="text-decoration-none">
+                    <Card className="h-100 shadow-sm border-0">
+                      <Image src="/images/promo/promo1.png" alt="Promo 1" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
+                      <Card.Body className='px-0'>
+                        <Card.Title className='fw-semibold'>Big Year-End Sale!</Card.Title>
+                        <Card.Text className='text-muted'>SLUG co</Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </a>
+                </Link>
               </Col>
+
               <Col md={4}>
-                  <Card className='border-0'>
-                  <Image src="/images/promo/promo2.png" alt="Promo 2" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
-                  <Card.Body className='px-0'>
-                    <Card.Title className='fw-semibold'>Title</Card.Title>
-                    <Card.Text className='text-muted'>SLUG co</Card.Text>
-                  </Card.Body>
-                </Card>
+                <Link href="/promo/free-keychain" passHref legacyBehavior>
+                  <a className="text-decoration-none">
+                    <Card className="h-100 shadow-sm border-0">
+                      <Image src="/images/promo/promo2.png" alt="Promo 2" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
+                      <Card.Body className='px-0'>
+                        <Card.Title className='fw-semibold'>Free Exclusive LEGO Keychain</Card.Title>
+                        <Card.Text className='text-muted'>SLUG co</Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </a>
+                </Link>
               </Col>
+
               <Col md={4}>
-                  <Card className='border-0'>
-                  <Image src="/images/promo/promo3.png" alt="Promo 3" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
-                  <Card.Body className='px-0'>
-                    <Card.Title className='fw-semibold'>Title</Card.Title>
-                    <Card.Text className='text-muted'>SLUG co</Card.Text>
-                  </Card.Body>
-                </Card>
+                <Link href="/promo/special-cashback" passHref legacyBehavior>
+                  <a className="text-decoration-none">
+                    <Card className="h-100 shadow-sm border-0">
+                      <Image src="/images/promo/promo3.png" alt="Promo 3" width={500} height={300} style={{objectFit: 'cover', borderRadius: '0.375rem'}} />
+                      <Card.Body className='px-0'>
+                        <Card.Title className='fw-semibold'>Special 10% Cashback</Card.Title>
+                        <Card.Text className='text-muted'>SLUG co</Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </a>
+                </Link>
               </Col>
             </Row>
           </Container>

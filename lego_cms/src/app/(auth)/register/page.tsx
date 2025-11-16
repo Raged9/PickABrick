@@ -77,8 +77,8 @@ export default function RegisterPage() {
     <main>
       <Container 
         fluid 
-        className="vh-100 d-flex align-items-center justify-content-center p-3 position-relative"
-        style={{ backgroundColor: '#f8f9fa', overflow: 'hidden' }} // Tambahkan background
+        className=" d-flex align-items-center justify-content-center p-3 position-relative"
+        style={{ backgroundColor: '#f8f9fa' }} // Tambahkan background
       >
         
         <Image src={yellowBrickImg} alt="Yellow brick" width={100} height={100} className="position-absolute d-none d-md-block" style={{ top: '10%', left: '15%', transform: 'rotate(30deg)', opacity: 0.9, zIndex: 1 }}/>
@@ -86,11 +86,11 @@ export default function RegisterPage() {
         <Image src={minifigureImg} alt="Minifigure" width={220} height={320} className="position-absolute d-none d-lg-block" style={{ bottom: '0%', right: '10%', transform: 'rotate(10deg)', zIndex: 1 }}/>
 
         <Card 
-          className="border-0 rounded-4 shadow-lg"
+          className="border-0 rounded-4 shadow-lg "
           style={{ width: '100%', maxWidth: '480px', zIndex: 2, position: 'relative' }}
         >
           <CloseButton 
-            style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', fontSize: '1rem', zIndex: 3 }}
+            style={{ position: 'absolute', top: '2.5rem', right: '1.5rem', fontSize: '1rem', zIndex: 3 }}
             onClick={() => router.push('/')}
           />
 

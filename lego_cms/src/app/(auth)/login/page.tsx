@@ -73,7 +73,7 @@ export default function LoginPage() {
           style={{ width: '100%', maxWidth: '480px', zIndex: 2, position: 'relative' }}
         >
           <CloseButton 
-            style={{ position: 'absolute', top: '1.5rem', right: '1.imsrem', fontSize: '1rem', zIndex: 3 }}
+            style={{ position: 'absolute', top: '1.5rem', right: '1.1rem', fontSize: '1rem', zIndex: 3 }}
             onClick={() => router.push('/')}
           />
 

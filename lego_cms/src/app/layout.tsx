@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import { Container, Row, Col, Button, Navbar, Nav, Form, InputGroup, Modal, CloseButton } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faSearch, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faFacebook, faLinkedin, faTwitter, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Image from 'next/image';
@@ -209,7 +209,7 @@ export default function RootLayout({
                   width={150}
                   height={90}
                   className="position-absolute d-none d-md-block"
-                  style={{ bottom: '0%', left: '0%', zIndex: 1, transform: 'translateX(-20%)' }}
+                  style={{ bottom: '3%', left: '0%', zIndex: 1, transform: 'translateX(-10%)' }}
                 />
                 <Image
                   src={minifigureImg}
@@ -217,7 +217,7 @@ export default function RootLayout({
                   width={180}
                   height={260}
                   className="position-absolute d-none d-md-block"
-                  style={{ bottom: '0%', right: '0%', zIndex: 1, transform: 'translateX(15%)' }}
+                  style={{ bottom: '0%', right: '-2%', zIndex: 1, transform: 'rotate(10deg)' }}
                 />
 
                 {/* === KONTEN MODAL === */}

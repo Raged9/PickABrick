@@ -17,9 +17,11 @@ const minifigureImg = '/images/legoman.png';
 
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SearchProvider, useSearch } from './contexts/SearchContext';
 
 function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
   const { user } = useAuth();
+  const { searchTerm, setSearchTerm } = useSearch();
 
   return (
     <div className="d-flex align-items-center ms-lg-5 gap-3">
@@ -31,8 +33,10 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
               type="text" 
               placeholder="Search..." 
               className="border-0"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Button variant="white" className="border-0 bg-white">
+            <Button variant="white" className="border-0 bg-white" onClick={() => setSearchTerm('')}>
             <FontAwesomeIcon icon={faXmark} />
            </Button>
         </InputGroup>
@@ -113,6 +117,7 @@ export default function RootLayout({
 
         <AuthProvider>
           <FavoritesProvider>
+            <SearchProvider>
 
           {/* Style Global */}
           <style jsx global>{`
@@ -300,6 +305,7 @@ export default function RootLayout({
               </Modal.Body>
             </Modal>
           </footer>
+          </SearchProvider>
           </FavoritesProvider> 
         </AuthProvider>
       </body>

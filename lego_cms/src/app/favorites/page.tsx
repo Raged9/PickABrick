@@ -10,6 +10,7 @@ import Link from 'next/link';
 
 import { allProducts } from '../../data/products';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useSearch } from '../contexts/SearchContext';
 
 export default function FavoritesPage() {
   
@@ -20,10 +21,22 @@ export default function FavoritesPage() {
     isFavorite, 
     isLoading
   } = useFavorites();
-
+  
+  const { searchTerm } = useSearch();
+  
   const favoriteProducts = allProducts.filter(product => 
     favoriteIds.includes(String(product.id))
   );
+
+  const filteredFavoriteProducts = favoriteProducts.filter(product => {
+    if (!searchTerm) return true;
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const nameMatch = product.name.toLowerCase().includes(lowerSearchTerm);
+    const skuMatch = product.sku.toLowerCase().includes(lowerSearchTerm);
+    
+    return nameMatch || skuMatch;
+  });
 
   if (isLoading) {
     return (
@@ -36,7 +49,6 @@ export default function FavoritesPage() {
 
   return (
     <>
-      {/* Konten Halaman Favorit */}
       <main>
         <section className="py-5" id="products">
           <Container className="py-4">
@@ -44,9 +56,20 @@ export default function FavoritesPage() {
             
             <Row className="g-4">
               
-              {favoriteProducts.length > 0 ? (
-                
-                favoriteProducts.map((product) => {
+              {!isLoading && favoriteProducts.length === 0 && (
+                <Col className="text-center py-5">
+                  <h4 className='text-muted'>You haven't added any favorites yet.</h4>
+                  <Link href="/products" className="btn btn-dark rounded-3 fw-semibold">Browse products</Link>
+                </Col>
+              )}
+
+              {!isLoading && favoriteProducts.length > 0 && filteredFavoriteProducts.length === 0 && (
+                <Col className="text-center py-5">
+                  <h4 className='text-muted'>No favorites found matching "{searchTerm}".</h4>
+                </Col>
+              )}
+              
+              {filteredFavoriteProducts.map((product) => {
                   const isFav = isFavorite(product.id);
 
                   return (
@@ -67,7 +90,6 @@ export default function FavoritesPage() {
                               variant="light" 
                               className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
                               style={{width: '35px', height: '35px'}}
-                              // (9. BARU) Ubah onClick jadi async
                               onClick={async () => {
                                 if (isFav) {
                                   await removeFavorite(product.id);
@@ -103,12 +125,8 @@ export default function FavoritesPage() {
                     </Col>
                   );
                 })
-              ) : (
-                <Col className="text-center py-5">
-                  <h4 className='text-muted'>You haven't added any favorites yet.</h4>
-                  <Link href="/products" className="btn btn-dark rounded-3 fw-semibold">Browse products</Link>
-                </Col>
-              )}
+              }
+              
             </Row>
           </Container>
         </section>

@@ -10,25 +10,17 @@ export default function ProfilePage() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  // --- 1. Logika Perlindungan Rute ---
-  // Cek ini saat komponen dimuat
   useEffect(() => {
-    // Jika 'user' adalah null (tidak ada yang login),
-    // kembalikan mereka ke halaman login.
     if (user === null) {
       router.push('/login');
     }
-  }, [user, router]); // Jalankan efek ini setiap kali 'user' berubah
+  }, [user, router]);
 
-  // --- 2. Logika Tombol Logout ---
   const handleLogout = () => {
-    logout(); // Hapus user dari state global
-    router.push('/'); // Kembalikan ke homepage
+    logout();
+    router.push('/');
   };
 
-  // --- 3. Tampilan Loading ---
-  // Tampilkan ini selagi 'user' masih dicek
-  // atau selagi proses redirect ke /login berjalan.
   if (!user) {
     return (
       <Container className="d-flex vh-100 justify-content-center align-items-center">
@@ -39,8 +31,6 @@ export default function ProfilePage() {
     );
   }
 
-  // --- 4. Tampilan Halaman Profil ---
-  // Jika kita sampai di sini, berarti 'user' sudah terisi (login berhasil)
   return (
     <Container className="my-5 py-5">
       <Row className="justify-content-center">
@@ -50,7 +40,7 @@ export default function ProfilePage() {
               
               {/* Gambar Profil */}
               <Image 
-                src="/images/profile.png" // Menggunakan gambar profil yang sama
+                src="/images/profile.png"
                 width={120} 
                 height={120} 
                 alt={user.username} 

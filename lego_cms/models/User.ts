@@ -5,6 +5,7 @@ export interface IUser extends Document {
   email: string;
   username: string;
   password: string;
+  favorites: string[];
 }
 
 const UserSchema: Schema = new Schema({
@@ -25,6 +26,11 @@ const UserSchema: Schema = new Schema({
     required: [true, 'Please provide a password.'],
     minlength: 6,
   },
+
+  favorites: {
+    type: [String],
+    default: [],
+  }
 }
 );
 

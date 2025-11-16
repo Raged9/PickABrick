@@ -6,6 +6,7 @@ interface IUser {
   id: string;
   email: string;
   username: string;
+  favorites: string[];
 }
 
 // 2. Definisikan apa yang akan disediakan oleh context

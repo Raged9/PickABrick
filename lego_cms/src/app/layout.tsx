@@ -144,7 +144,7 @@ export default function RootLayout({
               <Navbar.Collapse id="navbar-nav">
                 <Nav className="me-auto ms-5">
                   <Nav.Link as={Link} href="/products" className="fw-semibold text-dark">PRODUCTS</Nav.Link>
-                  <Nav.Link href="#discover" className="fw-semibold text-dark">DISCOVER</Nav.Link>
+                  <Nav.Link as={Link} href="/discover" className="fw-semibold text-dark">DISCOVER</Nav.Link>
                   <Nav.Link href="#category" className="fw-semibold text-dark">CATEGORY</Nav.Link>
                 </Nav>
                   <AuthNavArea onShowLoginModal={handleShowLoginModal} />

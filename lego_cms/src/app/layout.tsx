@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import { Container, Row, Col, Button, Navbar, Nav, Form, InputGroup, Modal, CloseButton } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faSearch, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faFacebook, faLinkedin, faTwitter, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Image from 'next/image';
@@ -15,8 +15,87 @@ const yellowBrickImg = '/images/studs.png';
 const redBrickImg = '/images/brickclean.png';
 const minifigureImg = '/images/legoman.png';
 
-// (1. BARU) Import Provider Favorit Anda
 import { FavoritesProvider } from './contexts/FavoritesContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SearchProvider, useSearch } from './contexts/SearchContext';
+
+function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
+  const { user } = useAuth();
+  const { searchTerm, setSearchTerm } = useSearch();
+
+  return (
+    <div className="d-flex align-items-center ms-lg-5 gap-3">
+      <InputGroup style={{maxWidth: '400px', borderRadius: '50px', overflow: 'hidden'}}>
+      <InputGroup.Text className="bg-white border-0">
+        <FontAwesomeIcon icon={faSearch} />
+          </InputGroup.Text>
+            <Form.Control 
+              type="text" 
+              placeholder="Search..." 
+              className="border-0"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Button variant="white" className="border-0 bg-white" onClick={() => setSearchTerm('')}>
+            <FontAwesomeIcon icon={faXmark} />
+           </Button>
+        </InputGroup>
+      
+      {/* Tombol Hati */}
+      <Button as={Link} href="/favorites" variant="light" className="d-flex align-items-center justify-content-center shadow-sm" style={{width: '32px', height: '32px', borderRadius: '50%'}}>
+        <FontAwesomeIcon icon={faHeart} />
+      </Button>
+      
+      {user ? (
+        // A. JIKA SUDAH LOGIN
+        <div className="d-flex align-items-center gap-2">
+          <Button 
+            as={Link}
+            href="/profile"
+            variant="light"
+            title="View Profile"
+            className="rounded-circle d-flex align-items-center justify-content-center"
+            style={{
+              width: '32px', 
+              height: '32px', 
+              minWidth: '32px', 
+              minHeight: '32px', 
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
+              overflow: 'hidden'
+            }}
+          >
+            <Image 
+              src="/images/profile.png" 
+              alt={user.username}
+              width={22}
+              height={22}
+              style={{objectFit: 'cover', borderRadius: '50%'}}
+            />
+          </Button>
+
+          {/* Username (di KANAN, tanpa "Hi,") */}
+          <span className="fw-semibold text-dark d-none d-lg-block">
+            {user.username}
+          </span>
+        </div>
+      ) : (
+        // B. JIKA BELUM LOGIN (KODE ASLI ANDA)
+        <Button 
+          variant="light"
+          onClick={onShowLoginModal}
+          className="rounded-circle d-flex align-items-center justify-content-center"
+          style={{width: '32px', height: '32px', minWidth: '32px', minHeight: '32px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', overflow: 'hidden'}}
+        >
+          <Image 
+            src="/images/profile.png" 
+            alt="Profile" 
+            width={22} height={22} style={{objectFit: 'cover', borderRadius: '50%'}}
+          />
+        </Button>
+      )}
+    </div>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -35,8 +114,10 @@ export default function RootLayout({
         <meta name="description" content="Where all the best and antique lego called gathered" />
       </head>
       <body>
-        {/* (2. BARU) Bungkus semua dengan Provider */}
-        <FavoritesProvider>
+
+        <AuthProvider>
+          <FavoritesProvider>
+            <SearchProvider>
 
           {/* Style Global */}
           <style jsx global>{`
@@ -63,52 +144,10 @@ export default function RootLayout({
               <Navbar.Collapse id="navbar-nav">
                 <Nav className="me-auto ms-5">
                   <Nav.Link as={Link} href="/products" className="fw-semibold text-dark">PRODUCTS</Nav.Link>
-                  <Nav.Link href="#discover" className="fw-semibold text-dark">DISCOVER</Nav.Link>
+                  <Nav.Link as={Link} href="/discover" className="fw-semibold text-dark">DISCOVER</Nav.Link>
                   <Nav.Link href="#category" className="fw-semibold text-dark">CATEGORY</Nav.Link>
                 </Nav>
-                <div className="d-flex align-items-center ms-lg-5 gap-3">
-                  <InputGroup style={{maxWidth: '400px', borderRadius: '50px', overflow: 'hidden'}}>
-                    <InputGroup.Text className="bg-white border-0">
-                      <FontAwesomeIcon icon={faSearch} />
-                    </InputGroup.Text>
-                    <Form.Control 
-                      type="text" 
-                      placeholder="Search..." 
-                      className="border-0"
-                    />
-                    <Button variant="white" className="border-0 bg-white">
-                      <FontAwesomeIcon icon={faXmark} />
-                    </Button>
-                  </InputGroup>
-                  
-                  {/* (MODIFIKASI) Tombol hati diperbaiki dengan <Link> membungkus <Button as="a"> */}
-                  <Button as={Link} href="/favorites" variant="light" className="d-flex align-items-center justify-content-center shadow-sm" style={{width: '32px', height: '32px', borderRadius: '50%'}}>
-                    <FontAwesomeIcon icon={faHeart} />
-                  </Button>
-                  
-                  {/* (MODIFIKASI) Div profil diubah jadi Button yang membuka modal */}
-                  <Button 
-                    variant="light"
-                    onClick={handleShowLoginModal}
-                    className="rounded-circle d-flex align-items-center justify-content-center"
-                    style={{
-                      width: '32px', 
-                      height: '32px', 
-                      minWidth: '32px', 
-                      minHeight: '32px', 
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <Image 
-                      src="/images/profile.png" 
-                      alt="Profile" 
-                      width={22}
-                      height={22}
-                      style={{objectFit: 'cover', borderRadius: '50%'}}
-                    />
-                  </Button>
-                </div>
+                  <AuthNavArea onShowLoginModal={handleShowLoginModal} />
               </Navbar.Collapse>
             </Container>
           </Navbar>
@@ -209,7 +248,7 @@ export default function RootLayout({
                   width={150}
                   height={90}
                   className="position-absolute d-none d-md-block"
-                  style={{ bottom: '0%', left: '0%', zIndex: 1, transform: 'translateX(-20%)' }}
+                  style={{ bottom: '3%', left: '0%', zIndex: 1, transform: 'translateX(-10%)' }}
                 />
                 <Image
                   src={minifigureImg}
@@ -217,7 +256,7 @@ export default function RootLayout({
                   width={180}
                   height={260}
                   className="position-absolute d-none d-md-block"
-                  style={{ bottom: '0%', right: '0%', zIndex: 1, transform: 'translateX(15%)' }}
+                  style={{ bottom: '0%', right: '-2%', zIndex: 1, transform: 'rotate(10deg)' }}
                 />
 
                 {/* === KONTEN MODAL === */}
@@ -266,8 +305,9 @@ export default function RootLayout({
               </Modal.Body>
             </Modal>
           </footer>
-        
-        </FavoritesProvider> {/* (4. BARU) Tutup Provider */}
+          </SearchProvider>
+          </FavoritesProvider> 
+        </AuthProvider>
       </body>
     </html>
   );

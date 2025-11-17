@@ -51,6 +51,7 @@ export async function POST(request: Request) {
           id: user._id,
           email: user.email,
           username: user.username,
+          favorites: user.favorites
         }
       },
       { status: 200 }

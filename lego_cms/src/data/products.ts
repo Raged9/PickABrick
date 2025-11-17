@@ -1,7 +1,7 @@
 // 1. Definisikan Tipe Data (Interface) Produk
 // Kita ekspor ini agar bisa dipakai di file lain (seperti Context)
 export interface Product {
-  id: number;
+  id: string;
   sku: string;
   name: string;
   price: string;
@@ -15,7 +15,7 @@ export interface Product {
 // Kita ekspor ini agar bisa di-import oleh semua halaman
 export const allProducts: Product[] = [
   {
-    id: 1,
+    id: '1',
     sku: 'LEGO - 75432',
     name: 'Classic Town Hall',
     price: 'Rp 1.299.000,00',
@@ -25,7 +25,7 @@ export const allProducts: Product[] = [
     description: 'Body text for describing what this product is and why this product is simply a must-buy.'
   },
   {
-    id: 2,
+    id: '2',
     sku: 'LEGO - 75432',
     name: 'Minifigure Set Series 1',
     price: 'Rp 1.599.000,00',
@@ -35,7 +35,7 @@ export const allProducts: Product[] = [
     description: 'A wonderful series of minifigures to collect.'
   },
   {
-    id: 3,
+    id: '3',
     sku: 'LEGO - 75432',
     name: 'Lego Pet Shop',
     price: 'Rp 2.399.000,00',
@@ -45,7 +45,7 @@ export const allProducts: Product[] = [
     description: 'Build your own adorable pet shop, complete with animals.'
   },
   {
-    id: 4,
+    id: '4',
     sku: 'LEGO - 75432',
     name: 'Lego Palace Cinema',
     price: 'Rp 1.299.000,00',
@@ -55,7 +55,7 @@ export const allProducts: Product[] = [
     description: 'Recreate the magic of the movies with this classic cinema.'
   },
   {
-    id: 5,
+    id: '5',
     sku: 'LEGO - 75432',
     name: 'Lego Pet Shop',
     price: 'Rp 2.399.000,00',
@@ -65,7 +65,7 @@ export const allProducts: Product[] = [
     description: 'Another variant of the lovely pet shop.'
   },
   {
-    id: 6,
+    id: '6',
     sku: 'LEGO - 75432',
     name: 'Minifigure Set Series 1',
     price: 'Rp 1.599.000,00',
@@ -75,7 +75,7 @@ export const allProducts: Product[] = [
     description: 'Continue your collection with Series 1.'
   },
   {
-    id: 7,
+    id: '7',
     sku: 'LEGO - 75432',
     name: 'Classic Town Hall',
     price: 'Rp 1.299.000,00',
@@ -85,7 +85,7 @@ export const allProducts: Product[] = [
     description: 'Body text for describing what this product is and why this product is simply a must-buy.'
   },
   {
-    id: 8,
+    id: '8',
     sku: 'LEGO - 75432',
     name: 'Minifigure Set Series 1',
     price: 'Rp 1.599.000,00',
@@ -95,7 +95,7 @@ export const allProducts: Product[] = [
     description: 'A wonderful series of minifigures to collect.'
   },
   {
-    id: 9,
+    id: '9',
     sku: 'LEGO - 75432',
     name: 'Lego Pet Shop',
     price: 'Rp 2.399.000,00',

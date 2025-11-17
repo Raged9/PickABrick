@@ -1,25 +1,54 @@
 'use client';
  
-// Import yang diperlukan
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons'; // Hati penuh
-import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'; // Hati kosong
+import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
-// (1. PENTING) Import hook 'useFavorites'
+import { allProducts } from '../../data/products';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useSearch } from '../contexts/SearchContext';
 
 export default function FavoritesPage() {
   
-  // (2. PENTING) Ambil data dan fungsi dari context
-  const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const { 
+    favorites: favoriteIds,
+    addFavorite, 
+    removeFavorite, 
+    isFavorite, 
+    isLoading
+  } = useFavorites();
+  
+  const { searchTerm } = useSearch();
+  
+  const favoriteProducts = allProducts.filter(product => 
+    favoriteIds.includes(String(product.id))
+  );
+
+  const filteredFavoriteProducts = favoriteProducts.filter(product => {
+    if (!searchTerm) return true;
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const nameMatch = product.name.toLowerCase().includes(lowerSearchTerm);
+    const skuMatch = product.sku.toLowerCase().includes(lowerSearchTerm);
+    
+    return nameMatch || skuMatch;
+  });
+
+  if (isLoading) {
+    return (
+      <Container className="text-center py-5 my-5">
+        <Spinner animation="border" role="status" className="my-3" />
+        <h4 className='text-muted'>Loading your favorites...</h4>
+      </Container>
+    );
+  }
 
   return (
     <>
-      {/* Konten Halaman Favorit */}
       <main>
         <section className="py-5" id="products">
           <Container className="py-4">
@@ -27,12 +56,21 @@ export default function FavoritesPage() {
             
             <Row className="g-4">
               
-              {/* (3. PENTING) Cek apakah daftar favorit kosong */}
-              {favorites.length > 0 ? (
-                
-                // (4. PENTING) Map dari 'favorites'
-                favorites.map((product) => {
-                  const isFav = isFavorite(product.id); // Cek status favorit
+              {!isLoading && favoriteProducts.length === 0 && (
+                <Col className="text-center py-5">
+                  <h4 className='text-muted'>You haven't added any favorites yet.</h4>
+                  <Link href="/products" className="btn btn-dark rounded-3 fw-semibold">Browse products</Link>
+                </Col>
+              )}
+
+              {!isLoading && favoriteProducts.length > 0 && filteredFavoriteProducts.length === 0 && (
+                <Col className="text-center py-5">
+                  <h4 className='text-muted'>No favorites found matching "{searchTerm}".</h4>
+                </Col>
+              )}
+              
+              {filteredFavoriteProducts.map((product) => {
+                  const isFav = isFavorite(product.id);
 
                   return (
                     <Col key={product.id} lg={4} md={6}>
@@ -48,17 +86,15 @@ export default function FavoritesPage() {
                             }}
                           />
                           <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
-                            
-                            {/* (5. PENTING) Tombol Hati yang sudah berfungsi */}
                             <Button 
                               variant="light" 
                               className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
                               style={{width: '35px', height: '35px'}}
-                              onClick={() => {
+                              onClick={async () => {
                                 if (isFav) {
-                                  removeFavorite(product.id);
+                                  await removeFavorite(product.id);
                                 } else {
-                                  addFavorite(product);
+                                  await addFavorite(product);
                                 }
                               }}
                             >
@@ -89,13 +125,8 @@ export default function FavoritesPage() {
                     </Col>
                   );
                 })
-              ) : (
-                // (6. PENTING) Pesan jika tidak ada favorit
-                <Col className="text-center py-5">
-                  <h4 className='text-muted'>You haven't added any favorites yet.</h4>
-                  <Link href="/products">Browse products</Link>
-                </Col>
-              )}
+              }
+              
             </Row>
           </Container>
         </section>

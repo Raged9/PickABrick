@@ -5,6 +5,7 @@ import { Container, Card, Form, Button, CloseButton, Alert } from 'react-bootstr
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 const yellowBrickImg = '/images/studs.png';
 const redBrickImg = '/images/brickclean.png';
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,13 +39,12 @@ export default function LoginPage() {
 
       if (res.ok) {
         // SUKSES
+        login(data.user);
         console.log('Login successful:', data);
-        
-        // Arahkan ke homepage (atau dashboard)
         router.push('/'); 
 
       } else {
-        // GAGAL (misal: "Invalid email or password")
+        // GAGAL
         setError(data.message || 'Login failed.');
       }
     } catch (err: any) {
@@ -73,7 +74,7 @@ export default function LoginPage() {
           style={{ width: '100%', maxWidth: '480px', zIndex: 2, position: 'relative' }}
         >
           <CloseButton 
-            style={{ position: 'absolute', top: '1.5rem', right: '1.imsrem', fontSize: '1rem', zIndex: 3 }}
+            style={{ position: 'absolute', top: '1.5rem', right: '1.1rem', fontSize: '1rem', zIndex: 3 }}
             onClick={() => router.push('/')}
           />
 

@@ -8,6 +8,7 @@ import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons'; // 
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'; // (2. MODIFIKASI) Ganti nama
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRef } from 'react';
 
 // (3. BARU) Import hook 'useFavorites' dan data produk
 import { useFavorites } from './contexts/FavoritesContext';
@@ -15,6 +16,16 @@ import { allProducts } from '../data/products';
 
 
 export default function Home() {
+
+    // Ref untuk About Section
+  const aboutRef = useRef<HTMLDivElement | null>(null);
+
+  // Fungsi Scroll ke About
+  const scrollToAbout = () => {
+    if (aboutRef.current) {
+      aboutRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   
   // (4. BARU) Ambil data dan fungsi dari context
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
@@ -31,11 +42,28 @@ export default function Home() {
             <Col lg={6}>
               <h1 className="display-3 fw-bold mb-3">Welcome to Pick A Brick!</h1>
               <p className="lead mb-4">Where all the best and antique lego called gathered</p>
-              <Button variant="light" size="lg" className="rounded-pill px-4 fw-semibold">
+              <Button variant="light" size="lg" className="rounded-pill px-4 fw-semibold" onClick={scrollToAbout}>
                 Learn More »
               </Button>
             </Col>
           </Row>
+        </Container>
+      </section>
+
+      {/* ABOUT SECTION — BARU */}
+      <section ref={aboutRef} className="py-5 bg-white">
+        <Container className="py-4">
+          <h2 className="fw-bold text-center mb-4">About Pick A Brick</h2>
+          <p
+            className="text-center mx-auto"
+            style={{ maxWidth: '700px', fontSize: '1.1rem' }}
+          >
+            Pick A Brick adalah toko LEGO yang menyediakan berbagai koleksi mulai dari yang
+            terbaru hingga yang rare & antique. Kami mengumpulkan berbagai item berkualitas
+            dari seluruh dunia untuk para kolektor, builder, dan pengguna LEGO dari semua usia.
+            Dengan ribuan stok dan penjualan yang terus meningkat, Pick A Brick selalu
+            berkomitmen memberikan pengalaman terbaik bagi para penggemar LEGO.
+          </p>
         </Container>
       </section>
 

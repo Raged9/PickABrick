@@ -40,3 +40,61 @@ a {
     color-scheme: dark;
   }
 }
+
+.nav-link {
+  transition: all 0.3s ease-in-out; 
+  padding-left: 10px !important;
+  border-radius: 8px;
+}
+
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1); 
+  transform: translateX(5px); 
+}
+
+
+.active-menu {
+  background-color: #ffc107 !important; 
+  color: #000000 !important; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateX(10px); 
+}
+
+.sidebar-link {
+  display: flex;              /* Menggunakan Flexbox agar Icon & Teks sejajar */
+  align-items: center;        /* Pastikan vertikal di tengah (Vertical Center) */
+  width: 100%;                /* Lebar penuh */
+  padding: 12px 20px;         /* Jarak dalam: Atas-Bawah 12px, Kiri-Kanan 20px */
+  margin-bottom: 8px;         /* Jarak antar menu */
+  border-radius: 12px;        /* Sudut membulat agar modern */
+  color: #ffffff;             /* Warna teks default putih */
+  text-decoration: none;      /* Hilangkan garis bawah */
+  transition: all 0.3s ease;  /* Animasi halus */
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Style saat mouse diarahkan (Hover) */
+.sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Background putih transparan */
+  transform: translateX(4px); /* Geser sedikit ke kanan */
+  color: #ffc107; /* Teks jadi kuning saat hover */
+}
+
+/* Style saat menu AKTIF (Current Page) */
+.sidebar-link.active {
+  background-color: #ffc107;  /* Background Kuning */
+  color: #0F0A3C;             /* Teks Biru Gelap (Kontras) */
+  font-weight: 700;           /* Teks tebal */
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3); /* Efek bayangan */
+  transform: translateX(0);   /* Reset posisi */
+}
+
+/* Mengatur jarak antara Icon dan Teks */
+.sidebar-link i {
+  margin-right: 12px;         /* Jarak icon ke teks */
+  font-size: 1.2rem;          /* Ukuran icon sedikit diperbesar */
+  display: flex;              /* Fix agar icon benar-benar di tengah */
+  align-items: center;
+}

@@ -13,15 +13,12 @@ import {
 import { Line, Bar } from 'react-chartjs-2';
 import { useState } from 'react';
 
-// Registrasi komponen Chart.js
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend
 );
 
 export default function TrendsPage() {
     const [timeFilter, setTimeFilter] = useState("Monthly");
-
-    // Dummy Data untuk Grafik
     const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     
     const productData = {
@@ -55,7 +52,7 @@ export default function TrendsPage() {
                 </select>
             </div>
 
-            {/* Row 1: Products & Users */}
+            {}
             <div className="row g-4 mb-4">
                 <div className="col-md-6">
                     <div className="card shadow-sm h-100">
@@ -79,7 +76,7 @@ export default function TrendsPage() {
                 </div>
             </div>
 
-            {/* Row 2: Favorites */}
+            {}
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">

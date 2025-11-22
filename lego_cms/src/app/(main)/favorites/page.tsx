@@ -1,75 +1,75 @@
 'use client';
-
-import { Container, Row, Col, Card, Button, Navbar, Nav, Badge } from 'react-bootstrap';
+ 
+import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
 
+import { allProducts } from '@/data/products';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useSearch } from '../contexts/SearchContext';
-import { allProducts } from '../../data/products';
 
-
-const categories = ["All", "Minifigure", "Super-Heroes", "City", "Friends", "Harry Potter", "Modular"];
-
-export default function ProductsPage() {
+export default function FavoritesPage() {
   
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const { 
+    favorites: favoriteIds,
+    addFavorite, 
+    removeFavorite, 
+    isFavorite, 
+    isLoading
+  } = useFavorites();
+  
   const { searchTerm } = useSearch();
+  
+  const favoriteProducts = allProducts.filter(product => 
+    favoriteIds.includes(String(product.id))
+  );
 
-
-  const filteredProducts = allProducts.filter(product => {
+  const filteredFavoriteProducts = favoriteProducts.filter(product => {
+    if (!searchTerm) return true;
     
-    // Filter Kategori
-    const categoryMatch = (selectedCategory === 'All') || (product.category === selectedCategory);
-
-    // Filter Search (case-insensitive)
     const lowerSearchTerm = searchTerm.toLowerCase();
     const nameMatch = product.name.toLowerCase().includes(lowerSearchTerm);
     const skuMatch = product.sku.toLowerCase().includes(lowerSearchTerm);
-    const searchMatch = nameMatch || skuMatch;
-
-    return categoryMatch && searchMatch;
+    
+    return nameMatch || skuMatch;
   });
 
+  if (isLoading) {
+    return (
+      <Container className="text-center py-5 my-5">
+        <Spinner animation="border" role="status" className="my-3" />
+        <h4 className='text-muted'>Loading your favorites...</h4>
+      </Container>
+    );
+  }
 
   return (
     <>
-      {/* FILTER BAR */}
-      <Navbar bg="light" variant="light" className="shadow-sm py-0" style={{ borderBottom: '1px solid #dee2e6' }}>
-        <Container>
-          <Nav className="flex-wrap">
-            {categories.map((category) => (
-              <Nav.Link 
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                active={selectedCategory === category}
-                className="fw-semibold"
-                style={{fontSize: '0.9rem', padding: '0.75rem 0.5rem'}}
-              >
-                {category.toUpperCase()}
-              </Nav.Link>
-            ))}
-          </Nav>
-        </Container>
-      </Navbar>
-
-      {/* KONTEN UTAMA HALAMAN */}
       <main>
         <section className="py-5" id="products">
           <Container className="py-4">
-            <h2 className="fw-bold mb-5">Products Available</h2>
+            <h2 className="fw-bold mb-5">Your Favorite Products</h2>
             
             <Row className="g-4">
               
-              {filteredProducts.length > 0 ? (
-                
-                filteredProducts.map((product) => {
+              {!isLoading && favoriteProducts.length === 0 && (
+                <Col className="text-center py-5">
+                  <h4 className='text-muted'>You haven't added any favorites yet.</h4>
+                  <Link href="/products" className="btn btn-dark rounded-3 fw-semibold">Browse products</Link>
+                </Col>
+              )}
+
+              {!isLoading && favoriteProducts.length > 0 && filteredFavoriteProducts.length === 0 && (
+                <Col className="text-center py-5">
+                  <h4 className='text-muted'>No favorites found matching "{searchTerm}".</h4>
+                </Col>
+              )}
+              
+              {filteredFavoriteProducts.map((product) => {
                   const isFav = isFavorite(product.id);
 
                   return (
@@ -86,7 +86,6 @@ export default function ProductsPage() {
                             }}
                           />
                           <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
-                            
                             <Button 
                               variant="light" 
                               className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
@@ -125,27 +124,11 @@ export default function ProductsPage() {
                       </Card>
                     </Col>
                   );
-                }) 
-              ) : (
-                <Col className="text-center py-5">
-                  <h4 className='text-muted'>
-                    No products found for "{selectedCategory}"
-                    {searchTerm && ` matching "${searchTerm}"`}
-                  </h4>
-                </Col>
-              )}
+                })
+              }
+              
             </Row>
           </Container>
-        </section>
-
-        {/* Filler Text Section */}
-        <section className='py-5 bg-light'>
-          {/* ... */}
-        </section>
-
-        {/* Discount and Promo Section */}
-        <section className="py-5">
-          {/* ... */}
         </section>
       </main>
     </>

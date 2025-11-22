@@ -12,7 +12,7 @@ import { useRef } from 'react';
 
 // (3. BARU) Import hook 'useFavorites' dan data produk
 import { useFavorites } from './contexts/FavoritesContext';
-import { allProducts } from '../data/products';
+import { allProducts } from '../../data/products';
 
 
 export default function Home() {

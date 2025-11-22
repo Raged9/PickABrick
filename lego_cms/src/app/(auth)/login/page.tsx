@@ -5,7 +5,7 @@ import { Container, Card, Form, Button, CloseButton, Alert } from 'react-bootstr
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/app/contexts/AuthContext';
+import { useAuth } from '@/app/(main)/contexts/AuthContext';
 
 const yellowBrickImg = '/images/studs.png';
 const redBrickImg = '/images/brickclean.png';

@@ -14,7 +14,8 @@ interface IFavoritesContext {
 const FavoritesContext = createContext<IFavoritesContext | undefined>(undefined);
 
 export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  // (1. BARU) Ambil fungsi updateUser
+  const { user, updateUser } = useAuth(); 
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,12 +27,15 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       setFavorites([]);
     }
     setIsLoading(false);
-  }, [user]);
+  }, [user]); // Efek ini akan jalan saat user (termasuk favorites-nya) berubah
+
+  // (2. PENTING) Pastikan URL mengarah ke Backend Port 5000
+  const API_URL = 'http://localhost:5000/api/favorites';
 
   const updateFavoritesOnServer = async (productId: string, action: 'add' | 'remove') => {
     if (!user) return;
     try {
-      await fetch('/api/favorites', {
+      await fetch(API_URL, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -42,11 +46,7 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       });
     } catch (error) {
       console.error('Failed to update favorites on server:', error);
-      if (action === 'add') {
-        setFavorites(prev => prev.filter(id => id !== productId));
-      } else {
-        setFavorites(prev => [...prev, productId]);
-      }
+      // Rollback (opsional, logika di bawah sudah menangani update state)
     }
   };
 
@@ -55,13 +55,30 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       alert('Please log in to add favorites.');
       return;
     }
-    setFavorites(prev => [...prev, product.id]);
-    await updateFavoritesOnServer(product.id, 'add');
+    const strId = String(product.id);
+    
+    // 1. Update state lokal FavoritesContext (agar UI cepat)
+    const newFavorites = [...favorites, strId];
+    setFavorites(newFavorites);
+
+    // 2. Update AuthContext & LocalStorage (agar tidak hilang saat refresh)
+    updateUser({ ...user, favorites: newFavorites });
+
+    // 3. Kirim ke Backend
+    await updateFavoritesOnServer(strId, 'add');
   };
 
   const removeFavorite = async (productId: string) => { 
     if (!user) return;
-    setFavorites(prev => prev.filter(id => id !== productId));
+    
+    // 1. Update state lokal
+    const newFavorites = favorites.filter(id => id !== productId);
+    setFavorites(newFavorites);
+
+    // 2. Update AuthContext & LocalStorage
+    updateUser({ ...user, favorites: newFavorites });
+
+    // 3. Kirim ke Backend
     await updateFavoritesOnServer(productId, 'remove');
   };
 

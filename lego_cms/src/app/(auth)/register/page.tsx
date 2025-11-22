@@ -37,7 +37,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/register', { // Panggil API
+      const res = await fetch('http://localhost:5000/api/register', { // Panggil API
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,7 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { Product } from '../../data/products'; 
+import { Product } from '@/data/products';
 
 interface IFavoritesContext {
   favorites: string[];

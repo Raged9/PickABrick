@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 
 import { useAuth } from '../contexts/AuthContext';
 import { useFavorites } from '../contexts/FavoritesContext';
-import { allProducts } from '../../data/products';
+import { allProducts } from '@/data/products';
 
 export default function ProfilePage() {
   

@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import { Container, Row, Col, Button, Navbar, Nav, Form, InputGroup, Modal, CloseButton, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faXmark, faUserSecret } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faXmark, faUserSecret, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faFacebook, faLinkedin, faTwitter, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import Image from 'next/image';
@@ -24,6 +24,7 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
   const { searchTerm, setSearchTerm } = useSearch();
   const router = useRouter();
 
+  const [showCartModal, setShowCartModal] = useState(false);
   const [showDevModal, setShowDevModal] = useState(false);
   const [step, setStep] = useState<'input' | 'setup'>('input'); 
   const [qrCode, setQrCode] = useState('');
@@ -113,6 +114,15 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
       
         <Button as={Link} href="/favorites" variant="light" className="d-flex align-items-center justify-content-center shadow-sm" style={{width: '32px', height: '32px', borderRadius: '50%'}}>
           <FontAwesomeIcon icon={faHeart} />
+        </Button>
+
+        <Button 
+            variant="light" 
+            className="d-flex align-items-center justify-content-center shadow-sm" 
+            style={{width: '32px', height: '32px', borderRadius: '50%'}}
+            onClick={() => setShowCartModal(true)}
+        >
+          <FontAwesomeIcon icon={faShoppingCart} />
         </Button>
         
         {user ? (
@@ -233,6 +243,41 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
           >
             {step === 'setup' ? 'Verify & Activate' : 'Enter Developer Mode'}
           </Button>
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={showCartModal} onHide={() => setShowCartModal(false)} centered>
+        <Modal.Header closeButton className="border-0 pb-0">
+            <Modal.Title className="fw-bold">Shopping Cart</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+            <p className="text-muted mb-4">Visit our marketplace to checkout items:</p>
+            
+            <div className="d-grid gap-3">
+                {/* Tombol Tokopedia */}
+                <Button 
+                    as="a" 
+                    href="https://www.tokopedia.com/"
+                    target="_blank"
+                    size="lg"
+                    className="d-flex align-items-center justify-content-center text-white fw-bold"
+                    style={{ backgroundColor: '#42B549', borderColor: '#42B549' }}
+                >
+                     Buy on Tokopedia
+                </Button>
+
+                {/* Tombol Shopee */}
+                <Button 
+                    as="a" 
+                    href="https://shopee.co.id/"
+                    target="_blank"
+                    size="lg"
+                    className="d-flex align-items-center justify-content-center text-white fw-bold"
+                    style={{ backgroundColor: '#EE4D2D', borderColor: '#EE4D2D' }}
+                >
+                     Buy on Shopee
+                </Button>
+            </div>
         </Modal.Body>
       </Modal>
     </>

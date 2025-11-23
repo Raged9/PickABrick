@@ -43,14 +43,12 @@ export default function ArticlePage() {
             // URL Backend Anda
             const res = await fetch('http://localhost:5000/api/articles', {
                 method: 'POST',
-                // Jangan set Content-Type header secara manual saat pakai FormData!
-                // Browser akan mengaturnya otomatis.
+
                 body: formData,
             });
 
             if (res.ok) {
                 alert(`Article ${status} successfully!`);
-                // Reset form atau redirect
                 router.push('/admin/article');
             } else {
                 alert('Failed to save article');

@@ -1,9 +1,14 @@
-"use client"
+'use client';
+
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { Spinner, Modal, Button, Form, Table, InputGroup } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
 
+// Tipe data sesuai MongoDB
 interface Product {
-    id: number;
+    _id: string;
     sku: string;
     name: string;
     description: string;
@@ -11,341 +16,288 @@ interface Product {
     stock: number;
     imageUrl: string;
     discount?: number;
+    category?: string;
     tokopediaLink?: string;
     shopeeLink?: string;
     otherLink?: string;
 }
 
 export default function StocksPage() {
-    // Data Dummy Awal
-    const [products, setProducts] = useState<Product[]>([
-        {
-            id: 1,
-            sku: "LEGO-10218",
-            name: "Lego Pet Shop",
-            description: "Modular Building Series, collectible set for adults.",
-            price: 2399000,
-            stock: 8,
-            imageUrl: "/image/lego_pet_shop.jpg",
-            discount: 10,
-            tokopediaLink: "https://www.tokopedia.com/lego-pet-shop",
-            shopeeLink: "https://shopee.co.id/lego-pet-shop",
-        },
-        {
-            id: 2,
-            sku: "LEGO-75301",
-            name: "Lego Luke Skywalker's X-Wing Fighter",
-            description: "Build an iconic Star Wars X-wing Fighter, featuring an opening cockpit.",
-            price: 799000,
-            stock: 3,
-            imageUrl: "/image/lego_xwing.jpg",
-            tokopediaLink: "https://www.tokopedia.com/lego-xwing",
-        },
-    ]);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    
+    // State untuk Modal
+    const [show, setShow] = useState(false);
+    const handleClose = () => {
+        setShow(false);
+        setTimeout(() => setEditingProduct(null), 200); // Reset form setelah tutup
+    };
+    const handleShow = () => setShow(true);
 
-    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    // State Form
+    const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [saving, setSaving] = useState(false);
 
-    // Load Bootstrap JS Client-Side
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            require("bootstrap/dist/js/bootstrap.bundle.min.js");
+    // 1. FETCH DATA DARI BACKEND
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch('http://localhost:5000/api/products');
+            if (!res.ok) throw new Error("Gagal fetch");
+            const data = await res.json();
+            setProducts(data);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        } finally {
+            setLoading(false);
         }
+    };
+
+    useEffect(() => {
+        fetchProducts();
     }, []);
 
-    // Handle Klik Tombol Edit
-    const handleEditClick = (product: Product) => {
-        setEditingProduct(product);
-        const modalElement = document.getElementById('productFormModal');
-        if (modalElement) {
-            // @ts-ignore
-            const bootstrap = window.bootstrap || (window as any).bootstrap;
-            if (bootstrap) {
-                const modal = new bootstrap.Modal(modalElement);
-                modal.show();
-            }
-        }
-    };
-
-    // Handle Tutup Modal
-    const handleCloseModal = () => {
-        const modalElement = document.getElementById('productFormModal');
-        if (modalElement) {
-            // @ts-ignore
-            const bootstrap = window.bootstrap || (window as any).bootstrap;
-            if (bootstrap) {
-                const modal = bootstrap.Modal.getInstance(modalElement); 
-                if (modal) {
-                    modal.hide();
-                }
-            }
-        }
-        setTimeout(() => setEditingProduct(null), 150);
-    };
-
-    // Handle Simpan Perubahan
-    const handleSaveProduct = (event: React.FormEvent) => {
-        event.preventDefault();
-        if (editingProduct) {
-            if (editingProduct.id === 0) {
-                 // Logic Tambah Produk Baru (Simulasi ID)
-                 const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-                 setProducts([...products, { ...editingProduct, id: newId }]);
-            } else {
-                // Logic Update Produk
-                setProducts(products.map(p => p.id === editingProduct.id ? editingProduct : p));
-            }
-        }
-        handleCloseModal();
-    };
-
-    // Handle Perubahan Input Form
-    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        if (editingProduct) {
-            setEditingProduct({
-                ...editingProduct,
-                [name]: name === "price" || name === "stock" || name === "discount" ? parseFloat(value) : value,
-            });
-        }
-    };
-
-    // Handle Buka Modal Tambah Produk
+    // Handle Klik Add New
     const openAddModal = () => {
-        setEditingProduct({
-            id: 0, 
-            sku: "", 
-            name: "", 
-            description: "", 
-            price: 0, 
-            stock: 0, 
-            imageUrl: "",
-            discount: 0
-        }); 
+        setEditingProduct({});
+        setImageFile(null);
+        handleShow();
+    };
+
+    // Handle Klik Edit
+    const openEditModal = (product: Product) => {
+        setEditingProduct(product);
+        setImageFile(null);
+        handleShow();
+    };
+
+    // Handle Save
+    const handleSaveProduct = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSaving(true);
+
+        const isNew = !editingProduct?._id;
+        const url = isNew 
+            ? 'http://localhost:5000/api/products' 
+            : `http://localhost:5000/api/products/${editingProduct?._id}`;
         
-        const modalElement = document.getElementById('productFormModal');
-        if (modalElement) {
-             // @ts-ignore
-             const bootstrap = window.bootstrap || (window as any).bootstrap;
-             if (bootstrap) {
-                 const modal = new bootstrap.Modal(modalElement);
-                 modal.show();
-             }
+        const method = isNew ? 'POST' : 'PUT';
+
+        const formData = new FormData();
+        // Masukkan data text (gunakan fallback string kosong agar tidak error null)
+        formData.append('sku', editingProduct?.sku || '');
+        formData.append('name', editingProduct?.name || '');
+        formData.append('description', editingProduct?.description || '');
+        formData.append('price', String(editingProduct?.price || 0));
+        formData.append('stock', String(editingProduct?.stock || 0));
+        formData.append('discount', String(editingProduct?.discount || 0));
+        formData.append('category', editingProduct?.category || 'Modular');
+        formData.append('tokopediaLink', editingProduct?.tokopediaLink || '');
+        formData.append('shopeeLink', editingProduct?.shopeeLink || '');
+        formData.append('otherLink', editingProduct?.otherLink || '');
+        
+        if (imageFile) {
+            formData.append('image', imageFile);
         }
-    }
+
+        try {
+            const res = await fetch(url, { method, body: formData });
+            if (res.ok) {
+                alert(isNew ? 'Product added!' : 'Product updated!');
+                fetchProducts();
+                handleClose();
+            } else {
+                alert('Failed to save product');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error saving product');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Handle Delete
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure delete this product?')) return;
+        try {
+            await fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' });
+            fetchProducts();
+        } catch (error) {
+            alert('Error deleting product');
+        }
+    };
+
+    // Form Change Handler
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setEditingProduct(prev => ({
+            ...prev,
+            [name]: (name === 'price' || name === 'stock' || name === 'discount') ? Number(value) : value
+        }));
+    };
+
+    // Helper URL Gambar
+    const getImageUrl = (path?: string) => {
+        if (!path) return '/images/placeholder-product.png';
+        if (path.startsWith('http')) return path;
+        return `http://localhost:5000/${path.replace(/\\/g, '/')}`;
+    };
 
     return (
-        <div className="container-fluid">
+        <div className="container-fluid py-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Stock Management</h2>
-                <button className="btn btn-primary" onClick={openAddModal}>
-                    <i className="bi bi-plus-lg"></i> Add New Product
-                </button>
+                <h2 className="fw-bold mb-0">Stock Management</h2>
+                <Button variant="primary" onClick={openAddModal}>
+                    <FontAwesomeIcon icon={faPlus} className="me-2" />
+                    Add New Product
+                </Button>
             </div>
 
-            {/* Grid Produk */}
-            <div className="row g-4">
-                {products.map((product) => (
-                    <div className="col-md-4 col-lg-3" key={product.id}>
-                        <div className="card h-100 shadow-sm product-card position-relative">
-                            
-                            {/* Gambar Produk */}
-                            <div className="d-flex align-items-center justify-content-center pt-3 position-relative" style={{ height: "180px", overflow: "hidden" }}>
-                                <Image
-                                    src={product.imageUrl || "/image/placeholder.png"} 
-                                    alt={product.name}
-                                    width={150}
-                                    height={150}
-                                    style={{ objectFit: 'contain' }}
-                                />
-                            </div>
-
-                            {/* Info Produk */}
-                            <div className="card-body pt-0 text-dark d-flex flex-column">
-                                {/* Diskon Tag */}
-                                {product.discount && product.discount > 0 ? (
-                                    <div className="mb-2">
-                                        <span className="badge rounded-pill bg-danger px-3 py-2">
-                                            Sale {product.discount}%
-                                        </span>
-                                    </div>
-                                ) : <div className="mb-2" style={{height: '31px'}}></div>}
-                                
-                                <small className="text-muted d-block mb-1">SKU : {product.sku}</small>
-                                <h5 className="card-title fw-bold mb-1 text-truncate">{product.name}</h5>
-                                
-                                {/* Menampilkan Description di Card (Truncated) */}
-                                <p className="card-text text-muted small text-truncate mb-3">
-                                    {product.description}
-                                </p>
-                                
-                                <div className="d-flex justify-content-between align-items-center mb-3 mt-auto">
-                                    <span className="fw-bold fs-5 text-primary">Rp {product.price.toLocaleString('id-ID')}</span>
-                                    <span className="badge bg-success py-2 px-3"><i className="bi bi-boxes me-1"></i> {product.stock} pcs</span>
-                                </div>
-                                
-                                <div className="d-grid">
-                                    <button 
-                                        className="btn btn-dark btn-sm rounded-pill py-2"
-                                        onClick={() => handleEditClick(product)}
-                                    >
-                                        <i className="bi bi-pencil me-2"></i> Edit
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Modal Form Add/Edit */}
-            <div className="modal fade" id="productFormModal" tabIndex={-1} aria-labelledby="productFormModalLabel" aria-hidden="true">
-                <div className="modal-dialog modal-lg modal-dialog-centered">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="productFormModalLabel">
-                                {editingProduct && editingProduct.id !== 0 ? "Edit Product" : "Add New Product"}
-                            </h5>
-                            <button type="button" className="btn-close" onClick={handleCloseModal} aria-label="Close"></button>
-                        </div>
-                        <form onSubmit={handleSaveProduct}>
-                            <div className="modal-body">
-                                <div className="mb-3">
-                                    <label htmlFor="productName" className="form-label">Product Name</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="productName"
-                                        name="name"
-                                        placeholder="e.g. Gundam RX-78"
-                                        value={editingProduct?.name || ''}
-                                        onChange={handleFormChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="productSKU" className="form-label">SKU</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="productSKU"
-                                        name="sku"
-                                        placeholder="e.g. GUNDAM-RX78-01"
-                                        value={editingProduct?.sku || ''}
-                                        onChange={handleFormChange}
-                                        required
-                                    />
-                                </div>
-                                
-                                {/* INPUT UNTUK MENGUBAH DESCRIPTION */}
-                                <div className="mb-3">
-                                    <label htmlFor="productDescription" className="form-label">Description</label>
-                                    <textarea
-                                        className="form-control"
-                                        id="productDescription"
-                                        name="description"
-                                        rows={3}
-                                        placeholder="Enter product description"
-                                        value={editingProduct?.description || ''}
-                                        onChange={handleFormChange}
-                                    ></textarea>
-                                </div>
-
-                                <div className="row">
-                                    <div className="col-md-4 mb-3">
-                                        <label htmlFor="productPrice" className="form-label">Price (Rp)</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            id="productPrice"
-                                            name="price"
-                                            value={editingProduct?.price || ''}
-                                            onChange={handleFormChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="col-md-4 mb-3">
-                                        <label htmlFor="productStock" className="form-label">Stock Qty</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            id="productStock"
-                                            name="stock"
-                                            value={editingProduct?.stock || ''}
-                                            onChange={handleFormChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="col-md-4 mb-3">
-                                        <label htmlFor="productDiscount" className="form-label">Discount (%)</label>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            id="productDiscount"
-                                            name="discount"
-                                            placeholder="0"
-                                            value={editingProduct?.discount || ''}
-                                            onChange={handleFormChange}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="productImage" className="form-label">Image URL / Upload</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="productImage"
-                                        name="imageUrl"
-                                        placeholder="e.g. /image/product-name.jpg"
-                                        value={editingProduct?.imageUrl || ''}
-                                        onChange={handleFormChange}
-                                    />
-                                </div>
-                                <hr />
-                                <h6>Marketplace Links</h6>
-                                <div className="input-group mb-2">
-                                    <span className="input-group-text bg-success text-white"><i className="bi bi-bag"></i> Tokopedia</span>
-                                    <input
-                                        type="url"
-                                        className="form-control"
-                                        name="tokopediaLink"
-                                        placeholder="https://www.tokopedia.com/your-product"
-                                        value={editingProduct?.tokopediaLink || ''}
-                                        onChange={handleFormChange}
-                                    />
-                                </div>
-                                <div className="input-group mb-2">
-                                    <span className="input-group-text bg-danger text-white"><i className="bi bi-shop"></i> Shopee</span>
-                                    <input
-                                        type="url"
-                                        className="form-control"
-                                        name="shopeeLink"
-                                        placeholder="https://shopee.co.id/your-product"
-                                        value={editingProduct?.shopeeLink || ''}
-                                        onChange={handleFormChange}
-                                    />
-                                </div>
-                                <div className="input-group mb-2">
-                                    <span className="input-group-text bg-info text-white"><i className="bi bi-link"></i> Other Link</span>
-                                    <input
-                                        type="url"
-                                        className="form-control"
-                                        name="otherLink"
-                                        placeholder="https://your-custom-link.com"
-                                        value={editingProduct?.otherLink || ''}
-                                        onChange={handleFormChange}
-                                    />
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>Cancel</button>
-                                <button type="submit" className="btn btn-primary">
-                                    {editingProduct && editingProduct.id !== 0 ? "Save Changes" : "Add Product"}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+            {/* Tampilan Loading */}
+            {loading ? (
+                <div className="text-center py-5">
+                    <Spinner animation="border" />
                 </div>
-            </div>
+            ) : (
+                <>
+                    {/* Grid Produk (Card View agar mirip screenshot Anda) */}
+                    {products.length === 0 ? (
+                        <div className="text-center py-5 text-muted bg-light rounded-3">
+                            <h4>No products found.</h4>
+                            <p>Click "Add New Product" to start.</p>
+                        </div>
+                    ) : (
+                        <div className="row g-4">
+                            {products.map((product) => (
+                                <div className="col-xl-3 col-lg-4 col-md-6" key={product._id}>
+                                    <div className="card h-100 border-0 shadow-sm product-card">
+                                        <div className="position-relative" style={{height: '200px', overflow: 'hidden', backgroundColor: '#f8f9fa'}}>
+                                            <Image 
+                                                src={getImageUrl(product.imageUrl)} 
+                                                alt={product.name}
+                                                fill
+                                                style={{objectFit: 'contain', padding: '15px'}}
+                                                onError={(e) => e.currentTarget.srcset = '/images/placeholder-product.png'}
+                                            />
+                                            {/* Badge Discount */}
+                                            {(product.discount || 0) > 0 && (
+                                                <span className="position-absolute top-0 start-0 m-2 badge bg-danger">
+                                                    Sale {product.discount}%
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="card-body d-flex flex-column">
+                                            <small className="text-muted mb-1">SKU: {product.sku}</small>
+                                            <h5 className="card-title fw-bold text-truncate" title={product.name}>{product.name}</h5>
+                                            
+                                            <div className="mt-auto pt-3 d-flex justify-content-between align-items-center">
+                                                <span className="fw-bold text-primary">
+                                                    Rp {product.price.toLocaleString('id-ID')}
+                                                </span>
+                                                <span className={`badge ${product.stock > 0 ? 'bg-success' : 'bg-secondary'}`}>
+                                                    Stock: {product.stock}
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="d-flex gap-2 mt-3">
+                                                <Button variant="outline-dark" size="sm" className="w-100" onClick={() => openEditModal(product)}>
+                                                    <FontAwesomeIcon icon={faEdit} /> Edit
+                                                </Button>
+                                                <Button variant="outline-danger" size="sm" onClick={() => handleDelete(product._id)}>
+                                                    <FontAwesomeIcon icon={faTrash} />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </>
+            )}
+
+            <Modal show={show} onHide={handleClose} size="lg" centered backdrop="static">
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        {editingProduct?._id ? "Edit Product" : "Add New Product"}
+                    </Modal.Title>
+                </Modal.Header>
+                <Form onSubmit={handleSaveProduct}>
+                    <Modal.Body>
+                        <div className="row g-3">
+                            {/* Nama & SKU */}
+                            <div className="col-md-8">
+                                <Form.Label>Product Name</Form.Label>
+                                <Form.Control type="text" name="name" value={editingProduct?.name || ''} onChange={handleChange} required />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Label>SKU</Form.Label>
+                                <Form.Control type="text" name="sku" value={editingProduct?.sku || ''} onChange={handleChange} required />
+                            </div>
+
+                            {/* Description */}
+                            <div className="col-12">
+                                <Form.Label>Description</Form.Label>
+                                <Form.Control as="textarea" rows={3} name="description" value={editingProduct?.description || ''} onChange={handleChange} />
+                            </div>
+
+                            {/* Harga, Stock, Discount */}
+                            <div className="col-md-4">
+                                <Form.Label>Price (Rp)</Form.Label>
+                                <Form.Control type="number" name="price" value={editingProduct?.price || ''} onChange={handleChange} required />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Label>Stock</Form.Label>
+                                <Form.Control type="number" name="stock" value={editingProduct?.stock || ''} onChange={handleChange} required />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Label>Discount (%)</Form.Label>
+                                <Form.Control type="number" name="discount" value={editingProduct?.discount || ''} onChange={handleChange} />
+                            </div>
+
+                            {/* Category */}
+                            <div className="col-md-6">
+                                <Form.Label>Category</Form.Label>
+                                <Form.Select name="category" value={editingProduct?.category || 'Modular'} onChange={handleChange}>
+                                    <option value="Modular">Modular</option>
+                                    <option value="City">City</option>
+                                    <option value="Minifigure">Minifigure</option>
+                                    <option value="Star Wars">Star Wars</option>
+                                    <option value="Harry Potter">Harry Potter</option>
+                                    <option value="Super Heroes">Super Heroes</option>
+                                    <option value="Friends">Friends</option>
+                                </Form.Select>
+                            </div>
+
+                            {/* Image Upload */}
+                            <div className="col-md-6">
+                                <Form.Label>Product Image</Form.Label>
+                                <Form.Control type="file" accept="image/*" onChange={(e: any) => setImageFile(e.target.files[0])} />
+                            </div>
+
+                            <div className="col-12"><hr /><h6>Marketplace Links (Optional)</h6></div>
+                            
+                            <div className="col-md-4">
+                                <Form.Control type="url" placeholder="Tokopedia Link" name="tokopediaLink" value={editingProduct?.tokopediaLink || ''} onChange={handleChange} />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Control type="url" placeholder="Shopee Link" name="shopeeLink" value={editingProduct?.shopeeLink || ''} onChange={handleChange} />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Control type="url" placeholder="Other Link" name="otherLink" value={editingProduct?.otherLink || ''} onChange={handleChange} />
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                        <Button variant="primary" type="submit" disabled={saving}>
+                            {saving ? 'Saving...' : 'Save Changes'}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
         </div>
     );
 }

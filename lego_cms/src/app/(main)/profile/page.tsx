@@ -7,11 +7,23 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useAuth } from '../contexts/AuthContext';
 import { useFavorites } from '../contexts/FavoritesContext';
-import { allProducts } from '@/data/products';
+
+interface Product {
+  _id: string;
+  sku: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  category: string;
+  stock: number;
+  tokopediaLink?: string;
+  shopeeLink?: string;
+}
 
 export default function ProfilePage() {
   
@@ -19,17 +31,47 @@ export default function ProfilePage() {
   const { favorites: favoriteIds, isLoading: favoritesLoading, removeFavorite, isFavorite } = useFavorites();
   const router = useRouter();
 
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+
   useEffect(() => {
     if (user === null) {
       router.push('/login');
     }
   }, [user, router]);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/products');
+        const data = await res.json();
+        setAllProducts(data);
+      } catch (error) {
+        console.error("Error loading products:", error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const favoriteProducts = allProducts.filter(product => 
-    favoriteIds.includes(String(product.id))
+    favoriteIds.includes(product._id)
   );
 
-  if (!user || favoritesLoading) {
+  const getImageUrl = (path: string) => {
+    if (!path) return '/images/placeholder-product.png';
+    if (path.startsWith('http')) return path;
+    return `http://localhost:5000/${path.replace(/\\/g, '/')}`;
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
+  // Tampilan Loading
+  if (!user || loadingData) {
     return (
       <Container className="d-flex vh-100 justify-content-center align-items-center">
         <Spinner animation="border" role="status">
@@ -38,12 +80,7 @@ export default function ProfilePage() {
       </Container>
     );
   }
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
-
+  
   return (
     <>
       <main>
@@ -51,6 +88,7 @@ export default function ProfilePage() {
           <Row className="justify-content-center">
             <Col lg={10}>
               
+              {/* Header Profile */}
               <div className="d-flex align-items-center mb-5">
                 <Image 
                   src="/images/profile.png" 
@@ -69,26 +107,34 @@ export default function ProfilePage() {
                 </div>
               </div>
 
+              {/* List Favorit */}
               <h3 className="fw-bold mb-4">My Favorites</h3>
               {favoriteProducts.length > 0 ? (
                 <Row className="g-4">
                   {favoriteProducts.map((product) => {
-                    const isFav = isFavorite(product.id);
+                    // Gunakan _id untuk cek favorit
+                    const isFav = isFavorite(product._id);
+                    
                     return (
-                      <Col md={6} lg={4} key={product.id}>
+                      <Col md={6} lg={4} key={product._id}>
                         <Card className="border-0 shadow-sm h-100">
-                          <div className="position-relative product-image-wrapper">
+                          <div className="position-relative product-image-wrapper" style={{height: '200px', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'#f8f9fa'}}>
                             <Image 
-                              src={product.image || '/images/placeholder-product.png'}
+                              // Gunakan getImageUrl agar gambar backend muncul
+                              src={getImageUrl(product.imageUrl)} 
                               alt={product.name}
-                              fill
-                              style={{objectFit: 'contain', padding: '20px'}}
+                              width={150}
+                              height={150}
+                              style={{objectFit: 'contain', padding: '10px'}}
+                              onError={(e) => {
+                                e.currentTarget.srcset = '/images/placeholder-product.png';
+                              }}
                             />
                             <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
                               <Button 
                                 onClick={async () => {
                                   if (isFav) {
-                                    await removeFavorite(product.id);
+                                    await removeFavorite(product._id);
                                   }
                                 }}
                                 variant="light" 
@@ -101,8 +147,9 @@ export default function ProfilePage() {
                           </div>
                           <Card.Body>
                             <p className="text-muted small mb-2">SKU : {product.sku}</p>
-                            <Card.Title className="fw-bold mb-3">{product.name}</Card.Title>
-                            <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
+                            <Card.Title className="fw-bold mb-3 text-truncate">{product.name}</Card.Title>
+                            {/* Link Detail pakai _id */}
+                            <Button as={Link} href={`/products/${product._id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
                               View Details
                             </Button>
                           </Card.Body>

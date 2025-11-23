@@ -1,6 +1,7 @@
 'use client';
- 
-import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap';
+
+import { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Button, Spinner, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
@@ -8,24 +9,51 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { allProducts } from '@/data/products';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useSearch } from '../contexts/SearchContext';
+
+interface Product {
+  _id: string;
+  sku: string;
+  name: string;
+  price: number;
+  stock: number;
+  imageUrl: string;
+  category: string;
+}
 
 export default function FavoritesPage() {
   
   const { 
     favorites: favoriteIds,
-    addFavorite, 
     removeFavorite, 
     isFavorite, 
-    isLoading
+    isLoading: favoritesLoading
   } = useFavorites();
   
   const { searchTerm } = useSearch();
   
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/products');
+        const data = await res.json();
+        setAllProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const favoriteProducts = allProducts.filter(product => 
-    favoriteIds.includes(String(product.id))
+    favoriteIds.includes(product._id)
   );
 
   const filteredFavoriteProducts = favoriteProducts.filter(product => {
@@ -38,7 +66,13 @@ export default function FavoritesPage() {
     return nameMatch || skuMatch;
   });
 
-  if (isLoading) {
+  const getImageUrl = (path: string) => {
+    if (!path) return '/images/placeholder-product.png';
+    if (path.startsWith('http')) return path;
+    return `http://localhost:5000/${path.replace(/\\/g, '/')}`;
+  };
+
+  if (favoritesLoading || loadingData) {
     return (
       <Container className="text-center py-5 my-5">
         <Spinner animation="border" role="status" className="my-3" />
@@ -56,35 +90,37 @@ export default function FavoritesPage() {
             
             <Row className="g-4">
               
-              {!isLoading && favoriteProducts.length === 0 && (
+              {favoriteProducts.length === 0 && (
                 <Col className="text-center py-5">
                   <h4 className='text-muted'>You haven't added any favorites yet.</h4>
-                  <Link href="/products" className="btn btn-dark rounded-3 fw-semibold">Browse products</Link>
+                  <Link href="/products" className="btn btn-dark rounded-3 fw-semibold mt-3">Browse products</Link>
                 </Col>
               )}
 
-              {!isLoading && favoriteProducts.length > 0 && filteredFavoriteProducts.length === 0 && (
+              {favoriteProducts.length > 0 && filteredFavoriteProducts.length === 0 && (
                 <Col className="text-center py-5">
                   <h4 className='text-muted'>No favorites found matching "{searchTerm}".</h4>
                 </Col>
               )}
               
               {filteredFavoriteProducts.map((product) => {
-                  const isFav = isFavorite(product.id);
+                  const isFav = isFavorite(product._id);
 
                   return (
-                    <Col key={product.id} lg={4} md={6}>
+                    <Col key={product._id} lg={4} md={6}>
                       <Card className="border-0 shadow-sm h-100">
-                        <div className="position-relative product-image-wrapper">
+                        <div className="position-relative product-image-wrapper" style={{height: '250px', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'#f8f9fa'}}>
+
                           <Image 
-                            src={product.image || '/images/placeholder-product.png'}
+                            src={getImageUrl(product.imageUrl)}
                             alt={product.name}
-                            fill
-                            style={{objectFit: 'contain', padding: '20px'}}
+                            width={200} height={200}
+                            style={{objectFit: 'contain', padding: '10px'}}
                             onError={(e) => {
-                              e.currentTarget.src = '/images/placeholder-product.png';
+                              e.currentTarget.srcset = '/images/placeholder-product.png';
                             }}
                           />
+
                           <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
                             <Button 
                               variant="light" 
@@ -92,10 +128,9 @@ export default function FavoritesPage() {
                               style={{width: '35px', height: '35px'}}
                               onClick={async () => {
                                 if (isFav) {
-                                  await removeFavorite(product.id);
-                                } else {
-                                  await addFavorite(product);
-                                }
+                                  await removeFavorite(product._id);
+                                } 
+
                               }}
                             >
                               <FontAwesomeIcon 
@@ -110,23 +145,30 @@ export default function FavoritesPage() {
                             </Button>
                           </div>
                         </div>
+
                         <Card.Body>
                           <p className="text-muted small mb-2">SKU : {product.sku}</p>
-                          <Card.Title className="fw-bold mb-3">{product.name}</Card.Title>
+                          <Card.Title className="fw-bold mb-3 text-truncate">{product.name}</Card.Title>
+                          
                           <div className="d-flex justify-content-between align-items-center mb-3">
-                            <span className="fw-bold fs-5">{product.price}</span>
-                            <span className="text-muted">🧩 {product.pieces}</span>
+
+                            <span className="fw-bold fs-5">Rp {product.price.toLocaleString('id-ID')}</span>
+                            
+                            <span className="text-muted small">
+                                <Badge bg={product.stock > 0 ? "success" : "danger"}>
+                                    {product.stock > 0 ? `${product.stock} in stock` : "Habis"}
+                                </Badge>
+                            </span>
                           </div>
-                          <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
+
+                          <Button as={Link} href={`/products/${product._id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
                             View Details
                           </Button>
                         </Card.Body>
                       </Card>
                     </Col>
                   );
-                })
-              }
-              
+              })}
             </Row>
           </Container>
         </section>

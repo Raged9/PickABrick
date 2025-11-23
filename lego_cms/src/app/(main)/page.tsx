@@ -1,23 +1,29 @@
 'use client';
 
-// Import HANYA yang diperlukan untuk halaman ini
-import { Container, Row, Col, Card, Button, Form, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Badge, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faBox, faChartLine, faStar } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons'; // (1. BARU) Hati penuh
-import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'; // (2. MODIFIKASI) Ganti nama
+import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
-// (3. BARU) Import hook 'useFavorites' dan data produk
 import { useFavorites } from './contexts/FavoritesContext';
-import { allProducts } from '../../data/products';
 
+interface Product {
+  _id: string;
+  sku: string;
+  name: string;
+  price: number;
+  stock: number;
+  imageUrl: string;
+  discount?: number;
+}
 
 export default function Home() {
 
-    // Ref untuk About Section
+  // Ref untuk About Section
   const aboutRef = useRef<HTMLDivElement | null>(null);
 
   // Fungsi Scroll ke About
@@ -27,11 +33,33 @@ export default function Home() {
     }
   };
   
-  // (4. BARU) Ambil data dan fungsi dari context
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
-  // Ambil 6 produk pertama untuk homepage
-  const products = allProducts.slice(0, 6);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/products');
+        const data = await res.json();
+        // Ambil 6 produk terbaru
+        setProducts(data.slice(0, 6));
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  // Helper URL Gambar
+  const getImageUrl = (path: string) => {
+    if (!path) return '/images/placeholder-product.png';
+    if (path.startsWith('http')) return path;
+    return `http://localhost:5000/${path.replace(/\\/g, '/')}`;
+  };
 
   return (
     <>
@@ -129,67 +157,102 @@ export default function Home() {
             </Button>
           </div>
 
-          <Row className="g-4">
-            {products.map((product) => {
-              // (5. BARU) Cek status favorit untuk setiap produk
-              const isFav = isFavorite(product.id);
+          {/* (5. BARU) Tampilkan Loading atau Produk */}
+          {loading ? (
+            <div className="text-center py-5">
+                <Spinner animation="border" />
+                <p className="mt-3">Loading products...</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-5 text-muted">
+                <p>No products available at the moment.</p>
+            </div>
+          ) : (
+            <Row className="g-4">
+                {products.map((product) => {
+                // (6. BARU) Cek status favorit (gunakan _id)
+                const isFav = isFavorite(product._id);
 
-              return (
-                <Col key={product.id} lg={4} md={6}>
-                  <Card className="border-0 shadow-sm h-100">
-                    <div className="position-relative product-image-wrapper">
-                      <Image 
-                        src={product.image} 
-                        alt={product.name}
-                        fill
-                        style={{objectFit: 'contain', padding: '20px'}}
-                        onError={(e) => {
-                          e.currentTarget.src = '/images/placeholder-product.png';
-                        }}
-                      />
-                      <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                return (
+                    <Col key={product._id} lg={4} md={6}>
+                    <Card className="border-0 shadow-sm h-100">
+                        <div className="position-relative product-image-wrapper" style={{height: '250px', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'#f8f9fa'}}>
+                        <Image 
+                            // (7. BARU) Gunakan getImageUrl
+                            src={getImageUrl(product.imageUrl)}
+                            alt={product.name}
+                            width={200} height={200}
+                            style={{objectFit: 'contain', padding: '15px'}}
+                            onError={(e) => {
+                                e.currentTarget.srcset = '/images/placeholder-product.png';
+                            }}
+                        />
                         
-                        {/* (6. DIUBAH) Tombol Hati yang sudah berfungsi */}
-                        <Button 
-                          variant="light" 
-                          className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
-                          style={{width: '35px', height: '35px'}}
-                          onClick={() => {
-                            if (isFav) {
-                              removeFavorite(product.id);
-                            } else {
-                              addFavorite(product);
-                            }
-                          }}
-                        >
-                          <FontAwesomeIcon 
-                            icon={isFav ? faHeartSolid : faHeartRegular} 
-                            size="sm" 
-                            color={isFav ? 'red' : 'inherit'} 
-                          />
-                        </Button>
+                        {/* Badge Diskon */}
+                        {(product.discount || 0) > 0 && (
+                            <span className="position-absolute top-0 start-0 m-3 badge bg-danger">
+                                Sale {product.discount}%
+                            </span>
+                        )}
 
-                        <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
-                          <FontAwesomeIcon icon={faShoppingCart} size="sm" />
+                        <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                            
+                            {/* Tombol Hati (Terhubung ke Context) */}
+                            <Button 
+                                variant="light" 
+                                className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
+                                style={{width: '35px', height: '35px'}}
+                                onClick={async () => {
+                                    if (isFav) {
+                                        await removeFavorite(product._id);
+                                    } else {
+                                        // Kirim data minimal untuk context (sesuaikan jika perlu)
+                                        await addFavorite({
+                                            id: product._id, // penting
+                                            name: product.name,
+                                            sku: product.sku,
+                                            price: String(product.price),
+                                            image: product.imageUrl,
+                                            pieces: String(product.stock),
+                                            category: 'General', // Default jika tidak ada di home
+                                            description: ''
+                                        } as any);
+                                    }
+                                }}
+                            >
+                            <FontAwesomeIcon 
+                                icon={isFav ? faHeartSolid : faHeartRegular} 
+                                size="sm" 
+                                color={isFav ? 'red' : 'inherit'} 
+                            />
+                            </Button>
+
+                            <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
+                                <FontAwesomeIcon icon={faShoppingCart} size="sm" />
+                            </Button>
+                        </div>
+                        </div>
+                        <Card.Body>
+                        <p className="text-muted small mb-2">SKU : {product.sku}</p>
+                        <Card.Title className="fw-bold mb-3 text-truncate">{product.name}</Card.Title>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            {/* Harga dengan format Rupiah */}
+                            <span className="fw-bold fs-5">Rp {product.price.toLocaleString('id-ID')}</span>
+                            {/* Stock Badge */}
+                            <span className="badge bg-success py-2 px-3">
+                                {product.stock} pcs
+                            </span>
+                        </div>
+                        <Button as={Link} href={`/products/${product._id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
+                            View Details
                         </Button>
-                      </div>
-                    </div>
-                    <Card.Body>
-                      <p className="text-muted small mb-2">SKU : {product.sku}</p>
-                      <Card.Title className="fw-bold mb-3">{product.name}</Card.Title>
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <span className="fw-bold fs-5">{product.price}</span>
-                        <span className="text-muted">🧩 {product.pieces}</span>
-                      </div>
-                      <Button as={Link} href={`/products/${product.id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
-                        View Details
-                      </Button>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              );
-            })}
-          </Row>
+                        </Card.Body>
+                    </Card>
+                    </Col>
+                );
+                })}
+            </Row>
+          )}
         </Container>
       </section>
 

@@ -25,6 +25,8 @@ interface AuthContextType {
   login: (userData: User) => void;
   logout: () => void;
   updateUser: (userData: User) => void;
+  isAdminUnlocked: boolean; 
+  unlockAdmin: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,6 +34,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(false); 
+  
   const router = useRouter();
 
   useEffect(() => {
@@ -40,6 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (storedUser) {
         setUser(JSON.parse(storedUser));
       }
+      
+      
+      const sessionUnlocked = sessionStorage.getItem('admin_unlocked');
+      if (sessionUnlocked === 'true') {
+        setIsAdminUnlocked(true);
+      }
+
     } catch (error) {
       console.error("Gagal mengambil session user:", error);
       setUser(null);
@@ -56,14 +69,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    setIsAdminUnlocked(false);
     localStorage.removeItem('app_user');
+    sessionStorage.removeItem('admin_unlocked'); 
     router.push('/login');
   };
-
 
   const updateUser = (userData: User) => {
     setUser(userData);
     localStorage.setItem('app_user', JSON.stringify(userData));
+  };
+
+  const unlockAdmin = () => {
+    setIsAdminUnlocked(true);
+    sessionStorage.setItem('admin_unlocked', 'true');
   };
 
   const isLoggedIn = !!user;
@@ -74,7 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     login,
     logout,
-    updateUser, // (3. BARU) Masukkan ke value
+    updateUser,
+    isAdminUnlocked, 
+    unlockAdmin      
   };
 
   return (

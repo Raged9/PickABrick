@@ -9,11 +9,9 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
-// Import Contexts
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useSearch } from '../contexts/SearchContext';
 
-// 1. Definisikan Tipe Data (Sesuai Model Backend)
 interface Product {
   _id: string;
   sku: string;
@@ -36,7 +34,6 @@ export default function ProductsPage() {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { searchTerm } = useSearch();
 
-  // 2. Fetch Data dari Backend saat halaman dibuka
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -53,19 +50,15 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  // 3. Helper untuk URL Gambar (Cloudinary vs Local)
   const getImageUrl = (path: string) => {
     if (!path) return '/images/placeholder-product.png';
-    if (path.startsWith('http')) return path; // Cloudinary
-    return `http://localhost:5000/${path.replace(/\\/g, '/')}`; // Localhost (fix backslash windows)
+    if (path.startsWith('http')) return path; 
+    return `http://localhost:5000/${path.replace(/\\/g, '/')}`; 
   };
 
-  // 4. Logika Filter (Category + Search)
   const filteredProducts = products.filter(product => {
-    // Filter Kategori
     const categoryMatch = selectedCategory === 'All' || product.category === selectedCategory;
 
-    // Filter Search
     const lowerSearch = searchTerm.toLowerCase();
     const nameMatch = product.name.toLowerCase().includes(lowerSearch);
     const skuMatch = product.sku.toLowerCase().includes(lowerSearch);
@@ -74,7 +67,6 @@ export default function ProductsPage() {
     return categoryMatch && searchMatch;
   });
 
-  // Tampilan Loading
   if (loading) {
     return (
       <Container className="d-flex vh-100 justify-content-center align-items-center">
@@ -144,11 +136,10 @@ export default function ProductsPage() {
                                 if (isFav) {
                                   await removeFavorite(product._id);
                                 } else {
-                                  // Konversi data MongoDB ke format yang diterima context (jika perlu)
                                   await addFavorite({
                                       id: product._id,
                                       name: product.name,
-                                      price: String(product.price), // Context butuh string? sesuaikan
+                                      price: String(product.price), 
                                       image: product.imageUrl,
                                       sku: product.sku,
                                       pieces: String(product.stock),

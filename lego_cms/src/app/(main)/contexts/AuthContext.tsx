@@ -14,6 +14,8 @@ interface User {
   username: string;
   email: string;
   favorites: string[];
+  role: 'user' | 'admin';
+  isTwoFactorEnabled: boolean;
 }
 
 interface AuthContextType {

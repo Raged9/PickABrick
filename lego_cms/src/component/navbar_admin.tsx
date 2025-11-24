@@ -15,9 +15,20 @@ export default function NavbarAdmin(){
                     />
                 </Link>
 
+                {}
+                <Link className="nav-link text-dark" href="/">
+                    {}
+                    <i className="bi bi-arrow-left fs-1"></i> 
+                </Link>
+                
                 <div className="d-flex">
-                    <Link className="btn btn-dark btn-sm fw-bold px-4 d-flex align-items-center justify-content-center" href="/">
-                        Back
+                    <Link 
+                        className="btn btn-dark rounded-pill px-4 fw-semibold d-flex align-items-center" 
+                        href="/"
+                        title="Kembali ke Website Utama"
+                    >
+                        <i className="bi bi-arrow-left me-2"></i> 
+                        Back to Home
                     </Link>
                 </div>
             </div>

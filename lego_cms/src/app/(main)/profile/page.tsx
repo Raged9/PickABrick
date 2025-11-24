@@ -70,7 +70,6 @@ export default function ProfilePage() {
     router.push('/');
   };
 
-  // Tampilan Loading
   if (!user || loadingData) {
     return (
       <Container className="d-flex vh-100 justify-content-center align-items-center">
@@ -107,12 +106,12 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* List Favorit */}
+              {}
               <h3 className="fw-bold mb-4">My Favorites</h3>
               {favoriteProducts.length > 0 ? (
                 <Row className="g-4">
                   {favoriteProducts.map((product) => {
-                    // Gunakan _id untuk cek favorit
+                    
                     const isFav = isFavorite(product._id);
                     
                     return (
@@ -120,7 +119,7 @@ export default function ProfilePage() {
                         <Card className="border-0 shadow-sm h-100">
                           <div className="position-relative product-image-wrapper" style={{height: '200px', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'#f8f9fa'}}>
                             <Image 
-                              // Gunakan getImageUrl agar gambar backend muncul
+                              
                               src={getImageUrl(product.imageUrl)} 
                               alt={product.name}
                               width={150}
@@ -148,7 +147,7 @@ export default function ProfilePage() {
                           <Card.Body>
                             <p className="text-muted small mb-2">SKU : {product.sku}</p>
                             <Card.Title className="fw-bold mb-3 text-truncate">{product.name}</Card.Title>
-                            {/* Link Detail pakai _id */}
+                            {}
                             <Button as={Link} href={`/products/${product._id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
                               View Details
                             </Button>
@@ -164,10 +163,6 @@ export default function ProfilePage() {
                   <Link href="/products" className="ms-1">Find some!</Link>
                 </p>
               )}
-              
-              <hr className="my-5" />
-              <h3 className="fw-bold mb-4">Order History</h3>
-              <p className="text-muted">You have no past orders.</p>
 
             </Col>
           </Row>

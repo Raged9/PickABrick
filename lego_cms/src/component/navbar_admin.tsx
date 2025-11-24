@@ -20,6 +20,17 @@ export default function NavbarAdmin(){
                     {}
                     <i className="bi bi-arrow-left fs-1"></i> 
                 </Link>
+                
+                <div className="d-flex">
+                    <Link 
+                        className="btn btn-dark rounded-pill px-4 fw-semibold d-flex align-items-center" 
+                        href="/"
+                        title="Kembali ke Website Utama"
+                    >
+                        <i className="bi bi-arrow-left me-2"></i> 
+                        Back to Home
+                    </Link>
+                </div>
             </div>
         </nav>
     )

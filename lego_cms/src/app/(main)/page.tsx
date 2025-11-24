@@ -23,10 +23,8 @@ interface Product {
 
 export default function Home() {
 
-  // Ref untuk About Section
   const aboutRef = useRef<HTMLDivElement | null>(null);
 
-  // Fungsi Scroll ke About
   const scrollToAbout = () => {
     if (aboutRef.current) {
       aboutRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -37,13 +35,14 @@ export default function Home() {
   
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [stats, setStats] = useState({ totalStock: 0, totalUsers: 0, totalReviews: 0 });
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await fetch('http://localhost:5000/api/products');
         const data = await res.json();
-        // Ambil 6 produk terbaru
         setProducts(data.slice(0, 6));
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -54,7 +53,19 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  // Helper URL Gambar
+  useEffect(() => {
+    const fetchStats = async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/stats');
+            const data = await res.json();
+            setStats(data);
+        } catch (error) {
+            console.error("Error fetching stats:", error);
+        }
+    };
+    fetchStats();
+  }, []);
+
   const getImageUrl = (path: string) => {
     if (!path) return '/images/placeholder-product.png';
     if (path.startsWith('http')) return path;
@@ -63,7 +74,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Section */}
+      {}
       <section className="hero-section text-white py-5">
         <Container className="py-5 hero-content">
           <Row className="align-items-center">
@@ -78,7 +89,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* ABOUT SECTION — BARU */}
+      {}
       <section ref={aboutRef} className="py-5 bg-white">
         <Container className="py-4">
           <h2 className="fw-bold text-center mb-4">About Pick A Brick</h2>
@@ -95,11 +106,13 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Stats Section */}
+      {}
       <section className="bg-light py-5">
         <Container className="py-4">
           <h2 className="text-center fw-bold mb-5">Stats Pick A Brick</h2>
           <Row className="g-4">
+            
+            {}
             <Col md={4}>
               <Card className="border-0 shadow-sm text-center h-100">
                 <Card.Body className="p-4">
@@ -107,12 +120,14 @@ export default function Home() {
                        style={{width: '80px', height: '80px'}}>
                     <FontAwesomeIcon icon={faBox} size="2x" />
                   </div>
-                  <h3 className="fw-bold">2,483</h3>
+                  <h3 className="fw-bold">{stats.totalStock.toLocaleString('id-ID')}</h3>
                   <p className="mb-1 fw-semibold">Total Stock</p>
                   <small className="text-muted">Items Available</small>
                 </Card.Body>
               </Card>
             </Col>
+            
+            {}
             <Col md={4}>
               <Card className="border-0 shadow-sm text-center h-100">
                 <Card.Body className="p-4">
@@ -120,12 +135,14 @@ export default function Home() {
                        style={{width: '80px', height: '80px'}}>
                     <FontAwesomeIcon icon={faChartLine} size="2x" />
                   </div>
-                  <h3 className="fw-bold">10,278</h3>
-                  <p className="mb-1 fw-semibold">Total Sales</p>
-                  <small className="text-muted">This Month</small>
+                  <h3 className="fw-bold">{stats.totalUsers.toLocaleString('id-ID')}</h3>
+                  <p className="mb-1 fw-semibold">Total Users</p>
+                  <small className="text-muted">Registered Accounts</small>
                 </Card.Body>
               </Card>
             </Col>
+            
+            {}
             <Col md={4}>
               <Card className="border-0 shadow-sm text-center h-100">
                 <Card.Body className="p-4">
@@ -133,17 +150,18 @@ export default function Home() {
                        style={{width: '80px', height: '80px'}}>
                     <FontAwesomeIcon icon={faStar} size="2x" />
                   </div>
-                  <h3 className="fw-bold">4.8 / 5</h3>
-                  <p className="mb-1 fw-semibold">Total Reviews</p>
-                  <small className="text-muted">From 3,269 Reviews</small>
+                  <h3 className="fw-bold">{stats.totalReviews.toLocaleString('id-ID')}</h3>
+                  <p className="mb-1 fw-semibold">Total Favorites</p>
+                  <small className="text-muted">User Interactions</small>
                 </Card.Body>
               </Card>
             </Col>
+
           </Row>
         </Container>
       </section>
 
-      {/* Products Section */}
+      {}
       <section className="py-5" id="products">
         <Container className="py-4">
           <h2 className="text-center fw-bold mb-5">Stock and Products</h2>
@@ -157,7 +175,6 @@ export default function Home() {
             </Button>
           </div>
 
-          {/* (5. BARU) Tampilkan Loading atau Produk */}
           {loading ? (
             <div className="text-center py-5">
                 <Spinner animation="border" />
@@ -170,7 +187,6 @@ export default function Home() {
           ) : (
             <Row className="g-4">
                 {products.map((product) => {
-                // (6. BARU) Cek status favorit (gunakan _id)
                 const isFav = isFavorite(product._id);
 
                 return (
@@ -178,7 +194,6 @@ export default function Home() {
                     <Card className="border-0 shadow-sm h-100">
                         <div className="position-relative product-image-wrapper" style={{height: '250px', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'#f8f9fa'}}>
                         <Image 
-                            // (7. BARU) Gunakan getImageUrl
                             src={getImageUrl(product.imageUrl)}
                             alt={product.name}
                             width={200} height={200}
@@ -188,7 +203,6 @@ export default function Home() {
                             }}
                         />
                         
-                        {/* Badge Diskon */}
                         {(product.discount || 0) > 0 && (
                             <span className="position-absolute top-0 start-0 m-3 badge bg-danger">
                                 Sale {product.discount}%
@@ -197,7 +211,6 @@ export default function Home() {
 
                         <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
                             
-                            {/* Tombol Hati (Terhubung ke Context) */}
                             <Button 
                                 variant="light" 
                                 className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
@@ -206,15 +219,14 @@ export default function Home() {
                                     if (isFav) {
                                         await removeFavorite(product._id);
                                     } else {
-                                        // Kirim data minimal untuk context (sesuaikan jika perlu)
                                         await addFavorite({
-                                            id: product._id, // penting
+                                            id: product._id, 
                                             name: product.name,
                                             sku: product.sku,
                                             price: String(product.price),
                                             image: product.imageUrl,
                                             pieces: String(product.stock),
-                                            category: 'General', // Default jika tidak ada di home
+                                            category: 'General', 
                                             description: ''
                                         } as any);
                                     }
@@ -236,9 +248,7 @@ export default function Home() {
                         <p className="text-muted small mb-2">SKU : {product.sku}</p>
                         <Card.Title className="fw-bold mb-3 text-truncate">{product.name}</Card.Title>
                         <div className="d-flex justify-content-between align-items-center mb-3">
-                            {/* Harga dengan format Rupiah */}
                             <span className="fw-bold fs-5">Rp {product.price.toLocaleString('id-ID')}</span>
-                            {/* Stock Badge */}
                             <span className="badge bg-success py-2 px-3">
                                 {product.stock} pcs
                             </span>
@@ -256,7 +266,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Limited Offers */}
+      {}
       <section className="bg-light py-5">
         <Container className="py-4">
           <h2 className="text-center fw-bold mb-5">Limited Time Offers</h2>
@@ -303,7 +313,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Newsletter */}
+      {}
       <section className="bg-yellow py-5">
         <Container className="text-center py-4">
           <h3 className="fw-bold mb-4">Subscribe to our newsletter for exclusive deals and new arrivals</h3>
@@ -322,4 +332,4 @@ export default function Home() {
       </section>
     </>
   );
-} 
+}

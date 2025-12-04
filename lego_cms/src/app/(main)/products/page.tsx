@@ -99,7 +99,6 @@ export default function ProductsPage() {
         </Container>
       </Navbar>
 
-      {/* KONTEN UTAMA */}
       <main>
         <section className="py-5" id="products">
           <Container className="py-4">
@@ -136,15 +135,15 @@ export default function ProductsPage() {
                                   await removeFavorite(product._id);
                                 } else {
                                   await addFavorite({
-                                      _id: product._id,
-                                      name: product.name,
-                                      price: String(product.price), 
-                                      image: product.imageUrl,
-                                      sku: product.sku,
-                                      pieces: String(product.stock),
-                                      category: product.category,
-                                      description: product.description
-                                  } as any);
+                                    _id: product._id,
+                                    sku: product.sku,
+                                    name: product.name,
+                                    description: product.description,
+                                    price: product.price,
+                                    stock: product.stock,
+                                    imageUrl: product.imageUrl,
+                                    category: product.category,
+                                  });
                                 }
                               }}
                             >
@@ -160,7 +159,6 @@ export default function ProductsPage() {
                             </Button>
                           </div>
                         </div>
-
 
                         <Card.Body>
                           <p className="text-muted small mb-2">SKU : {product.sku}</p>

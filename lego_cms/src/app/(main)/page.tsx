@@ -280,12 +280,12 @@ export default function Home() {
                                         await removeFavorite(product._id);
                                     } else {
                                         await addFavorite({
-                                            id: product._id, 
+                                            _id: product._id, 
                                             name: product.name,
                                             sku: product.sku,
-                                            price: String(product.price),
-                                            image: product.imageUrl,
-                                            pieces: String(product.stock),
+                                            price: product.price,
+                                            imageUrl: product.imageUrl,
+                                            stock: product.stock,
                                             category: 'General', 
                                             description: ''
                                         } as any);

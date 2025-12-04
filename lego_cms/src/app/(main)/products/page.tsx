@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Navbar, Nav, Spinner, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Navbar, Nav, Spinner, Badge, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faBagShopping, faShop } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';
@@ -31,6 +31,9 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { searchTerm } = useSearch();
 
@@ -155,8 +158,13 @@ export default function ProductsPage() {
                               />
                             </Button>
 
-                            <Button variant="light" className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
-                              <FontAwesomeIcon icon={faShoppingCart} size="sm" />
+                            <Button 
+                                variant="light" 
+                                className="rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center" 
+                                style={{width: '35px', height: '35px'}}
+                                onClick={() => handleCartClick(product)}
+                            >
+                                <FontAwesomeIcon icon={faShoppingCart} size="sm" />
                             </Button>
                           </div>
                         </div>
@@ -197,6 +205,35 @@ export default function ProductsPage() {
             </Row>
           </Container>
         </section>
+
+        <Modal show={showBuyModal} onHide={() => setShowBuyModal(false)} centered>
+        <Modal.Header closeButton className="border-0 pb-0">
+            <Modal.Title className="fw-bold">Buy {selectedProduct?.name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+            <p className="text-muted mb-4">Choose your preferred marketplace to purchase this item:</p>
+            
+            <div className="d-grid gap-3">
+                {/* Tombol Tokopedia */}
+                {selectedProduct?.tokopediaLink ? (
+                    <Button as="a" href={selectedProduct.tokopediaLink} target="_blank" size="lg" className="d-flex align-items-center justify-content-center text-white fw-bold" style={{ backgroundColor: '#42B549', borderColor: '#42B549' }}>
+                        <FontAwesomeIcon icon={faBagShopping} className="me-2" /> Buy on Tokopedia
+                    </Button>
+                ) : (
+                    <Button variant="secondary" disabled size="lg">Tokopedia (Out of Stock)</Button>
+                )}
+
+                {/* Tombol Shopee */}
+                {selectedProduct?.shopeeLink ? (
+                    <Button as="a" href={selectedProduct.shopeeLink} target="_blank" size="lg" className="d-flex align-items-center justify-content-center text-white fw-bold" style={{ backgroundColor: '#EE4D2D', borderColor: '#EE4D2D' }}>
+                        <FontAwesomeIcon icon={faShop} className="me-2" /> Buy on Shopee
+                    </Button>
+                ) : (
+                    <Button variant="secondary" disabled size="lg">Shopee (Out of Stock)</Button>
+                )}
+            </div>
+        </Modal.Body>
+      </Modal>
       </main>
     </>
   );

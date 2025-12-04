@@ -5,13 +5,13 @@ export default function NavbarAdmin(){
     return(
         <nav className="navbar navbar-expand-lg navbar-light bg-warning">
             <div className="container-fluid">
-                {}
                 <Link className="navbar-brand" href="/admin/trends">
                     <Image
-                        src="/image/logo.png"
+                        src="/images/logo.png"
                         alt="Pick A Brick"
                         width={70}
                         height={70}
+                        style={{objectFit: "contain"}}
                     />
                 </Link>
 

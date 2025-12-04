@@ -8,7 +8,6 @@ import { faCalendar, faUser, faArrowLeft } from '@fortawesome/free-solid-svg-ico
 import Image from 'next/image';
 import Link from 'next/link';
 
-// 1. Definisi Tipe Data
 interface Article {
   _id: string;
   title: string;
@@ -19,30 +18,29 @@ interface Article {
 }
 
 export default function ArticleDetailPage() {
-  // 2. Ambil ID dari URL
   const params = useParams();
   const articleId = params.articleId;
 
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 3. Helper URL Gambar (Sama seperti sebelumnya)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
   const getImageUrl = (path: string) => {
     if (!path) return '/images/placeholder-product.png';
     if (path.startsWith('http')) return path;
-    return `http://localhost:5000${path}`;
+    return `${BASE_URL}${path.replace(/\\/g, '/')}`;
   };
 
-  // 4. Fetch Data Artikel Spesifik
   useEffect(() => {
     if (!articleId) return;
 
     const fetchArticle = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/articles/${articleId}`);
+        const res = await fetch(`${API_URL}/articles/${articleId}`);
         
         if (!res.ok) {
-            // Jika 404 atau error lain
             setArticle(null);
         } else {
             const data = await res.json();
@@ -58,7 +56,6 @@ export default function ArticleDetailPage() {
     fetchArticle();
   }, [articleId]);
 
-  // --- TAMPILAN LOADING ---
   if (loading) {
     return (
       <Container className="d-flex vh-100 justify-content-center align-items-center flex-column">
@@ -68,21 +65,23 @@ export default function ArticleDetailPage() {
     );
   }
 
-  // --- TAMPILAN JIKA TIDAK DITEMUKAN ---
   if (!article) {
     return (
       <Container className="text-center py-5 my-5">
         <h2 className="fw-bold mb-3">Article Not Found</h2>
         <p className="text-muted mb-4">The article you are looking for does not exist or has been removed.</p>
-        <Button as={Link} href="/discover" variant="dark" className="rounded-pill px-4">
-          <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+        <Link 
+          href="/discover" 
+          className="btn btn-dark rounded-pill px-4"
+          style={{ textDecoration: 'none' }}
+        >
+        <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
           Back to Discover
-        </Button>
+        </Link>
       </Container>
     );
   }
 
-  // --- TAMPILAN UTAMA ---
   return (
     <main>
       <article className="py-5">
@@ -90,13 +89,11 @@ export default function ArticleDetailPage() {
           <Row className="justify-content-center">
             <Col lg={8}>
               
-              {/* Tombol Kembali */}
               <Link href="/discover" className="text-decoration-none text-muted mb-4 d-inline-block">
                 <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
                 Back to Articles
               </Link>
 
-              {/* Header Artikel */}
               <header className="mb-5">
                 <Badge bg="warning" text="dark" className="mb-3 px-3 py-2 rounded-pill">
                   {article.category}
@@ -122,21 +119,19 @@ export default function ArticleDetailPage() {
                 </div>
               </header>
 
-              {/* Gambar Utama */}
               <div className="position-relative w-100 mb-5 rounded-4 overflow-hidden shadow-sm" style={{ aspectRatio: '16/9' }}>
                 <Image
                   src={getImageUrl(article.thumbnail)}
                   alt={article.title}
                   fill
                   style={{ objectFit: 'cover' }}
-                  priority // Prioritas loading gambar utama
+                  priority
                 />
               </div>
 
-              {/* Konten Artikel */}
               <div 
                 className="article-content fs-5 lh-lg text-dark"
-                // style: white-space pre-wrap agar enter/baris baru terbaca
+
                 style={{ whiteSpace: 'pre-wrap', color: '#333' }}
               >
                 {article.content}
@@ -144,12 +139,11 @@ export default function ArticleDetailPage() {
 
               <hr className="my-5" />
 
-              {/* Footer Artikel */}
               <div className="text-center">
                 <p className="fw-bold mb-3">Enjoyed this article?</p>
-                <Button as={Link} href="/discover" variant="outline-dark" className="rounded-pill px-4">
+                <Link href="/discover" className="btn btn-outline-dark rounded-pill px-4" style={{ textDecoration: 'none' }}>
                   Read More Articles
-                </Button>
+                </Link>
               </div>
 
             </Col>

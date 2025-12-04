@@ -5,6 +5,7 @@ import {
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import { useState, useEffect, useCallback } from 'react';
+import { ApiError } from 'next/dist/server/api-utils';
 
 ChartJS.register(
   CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend
@@ -13,11 +14,9 @@ ChartJS.register(
 export default function TrendsPage() {
     const now = new Date();
     
-    // State Filter (Tahun & Bulan)
     const [selectedYear, setSelectedYear] = useState(now.getFullYear());
     const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1); // 1 = Januari
     
-    // State Data
     const [stats, setStats] = useState({ totalStock: 0, totalUsers: 0, totalReviews: 0 });
     const [daysLabels, setDaysLabels] = useState<number[]>([]); // Label tanggal dinamis (1-30/31)
     
@@ -29,11 +28,11 @@ export default function TrendsPage() {
         labels: [], data: []
     });
 
-    // --- FETCH DATA ---
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
     const fetchStats = useCallback(async () => {
         try {
-            // Panggil API dengan ?year=... & month=...
-            const res = await fetch(`http://localhost:5000/api/stats?year=${selectedYear}&month=${selectedMonth}&t=${new Date().getTime()}`);
+            const res = await fetch(`${API_URL}/stats?year=${selectedYear}&month=${selectedMonth}&t=${new Date().getTime()}`);
             const data = await res.json();
             
             setStats({
@@ -42,7 +41,6 @@ export default function TrendsPage() {
                 totalReviews: data.totalReviews
             });
 
-            // Buat label tanggal dinamis sesuai jumlah hari di bulan tsb
             if (data.meta && data.meta.daysInMonth) {
                 const days = Array.from({length: data.meta.daysInMonth}, (_, i) => i + 1);
                 setDaysLabels(days);
@@ -65,7 +63,7 @@ export default function TrendsPage() {
         } catch (error) {
             console.error('Failed to fetch stats:', error);
         }
-    }, [selectedYear, selectedMonth]); // Refresh saat tahun/bulan berubah
+    }, [selectedYear, selectedMonth]);
 
     useEffect(() => {
         fetchStats();
@@ -73,13 +71,10 @@ export default function TrendsPage() {
         return () => clearInterval(intervalId);
     }, [fetchStats]);
 
-    // --- CONFIG CHART ---
-    
-    // Nama bulan untuk label chart
     const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'long' });
 
     const productDataConfig = {
-        labels: daysLabels, // Label tanggal (1, 2, 3...)
+        labels: daysLabels,
         datasets: [{
             label: `Products Added (${monthName} ${selectedYear})`,
             data: lineChartData.products,
@@ -110,7 +105,6 @@ export default function TrendsPage() {
         }]
     };
 
-    // Helper untuk Generate Opsi Tahun & Bulan
     const years = Array.from({length: 5}, (_, i) => now.getFullYear() - i);
     const months = [
         { val: 1, name: 'January' }, { val: 2, name: 'February' }, { val: 3, name: 'March' },
@@ -130,11 +124,9 @@ export default function TrendsPage() {
                     </div>
                 </div>
                 
-                {/* --- FILTER AREA --- */}
                 <div className="d-flex align-items-center gap-2 bg-white p-2 rounded shadow-sm border">
                     <label className="fw-bold small text-muted mb-0">Period:</label>
                     
-                    {/* Select Month */}
                     <select 
                         className="form-select form-select-sm w-auto border-0 bg-light fw-semibold" 
                         value={selectedMonth} 
@@ -145,7 +137,6 @@ export default function TrendsPage() {
                         ))}
                     </select>
 
-                    {/* Select Year */}
                     <select 
                         className="form-select form-select-sm w-auto border-0 bg-light fw-semibold" 
                         value={selectedYear} 
@@ -158,7 +149,6 @@ export default function TrendsPage() {
                 </div>
             </div>
 
-            {/* Quick Stats Cards */}
             <div className="row g-4 mb-4">
                 <div className="col-md-4">
                     <div className="card shadow-sm border-0 h-100" style={{ borderLeft: '5px solid #0d6efd' }}>
@@ -186,7 +176,6 @@ export default function TrendsPage() {
                 </div>
             </div>
 
-            {/* Line Charts Section */}
             <div className="row g-4 mb-4">
                 <div className="col-md-6">
                     <div className="card shadow-sm h-100">
@@ -210,7 +199,6 @@ export default function TrendsPage() {
                 </div>
             </div>
 
-            {/* Favorites Bar Chart Section */}
             <div className="row">
                 <div className="col-12">
                     <div className="card shadow-sm">

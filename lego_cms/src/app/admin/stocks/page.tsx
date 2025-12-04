@@ -26,24 +26,24 @@ export default function StocksPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     
-    // State untuk Modal
     const [show, setShow] = useState(false);
     const handleClose = () => {
         setShow(false);
-        setTimeout(() => setEditingProduct(null), 200); // Reset form setelah tutup
+        setTimeout(() => setEditingProduct(null), 200);
     };
     const handleShow = () => setShow(true);
 
-    // State Form
     const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [saving, setSaving] = useState(false);
 
-    // 1. FETCH DATA DARI BACKEND
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/products');
+            const res = await fetch(`${API_URL}/products`);
             if (!res.ok) throw new Error("Gagal fetch");
             const data = await res.json();
             setProducts(data);
@@ -58,34 +58,30 @@ export default function StocksPage() {
         fetchProducts();
     }, []);
 
-    // Handle Klik Add New
     const openAddModal = () => {
         setEditingProduct({});
         setImageFile(null);
         handleShow();
     };
 
-    // Handle Klik Edit
     const openEditModal = (product: Product) => {
         setEditingProduct(product);
         setImageFile(null);
         handleShow();
     };
 
-    // Handle Save
     const handleSaveProduct = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
 
         const isNew = !editingProduct?._id;
         const url = isNew 
-            ? 'http://localhost:5000/api/products' 
-            : `http://localhost:5000/api/products/${editingProduct?._id}`;
+            ? `${API_URL}/products` 
+            : `${API_URL}/products/${editingProduct?._id}`;
         
         const method = isNew ? 'POST' : 'PUT';
 
         const formData = new FormData();
-        // Masukkan data text (gunakan fallback string kosong agar tidak error null)
         formData.append('sku', editingProduct?.sku || '');
         formData.append('name', editingProduct?.name || '');
         formData.append('description', editingProduct?.description || '');
@@ -118,18 +114,16 @@ export default function StocksPage() {
         }
     };
 
-    // Handle Delete
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure delete this product?')) return;
         try {
-            await fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' });
+            await fetch(`${API_URL}/products${id}`, { method: 'DELETE' });
             fetchProducts();
         } catch (error) {
             alert('Error deleting product');
         }
     };
 
-    // Form Change Handler
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setEditingProduct(prev => ({
@@ -138,11 +132,10 @@ export default function StocksPage() {
         }));
     };
 
-    // Helper URL Gambar
     const getImageUrl = (path?: string) => {
         if (!path) return '/images/placeholder-product.png';
         if (path.startsWith('http')) return path;
-        return `http://localhost:5000/${path.replace(/\\/g, '/')}`;
+        return `${BASE_URL}/${path.replace(/\\/g, '/')}`;
     };
 
     return (
@@ -155,14 +148,12 @@ export default function StocksPage() {
                 </Button>
             </div>
 
-            {/* Tampilan Loading */}
             {loading ? (
                 <div className="text-center py-5">
                     <Spinner animation="border" />
                 </div>
             ) : (
                 <>
-                    {/* Grid Produk (Card View agar mirip screenshot Anda) */}
                     {products.length === 0 ? (
                         <div className="text-center py-5 text-muted bg-light rounded-3">
                             <h4>No products found.</h4>

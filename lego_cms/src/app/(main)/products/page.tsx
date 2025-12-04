@@ -34,10 +34,13 @@ export default function ProductsPage() {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { searchTerm } = useSearch();
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/products');
+        const res = await fetch(`${API_URL}/products`);
         const data = await res.json();
         setProducts(data);
       } catch (error) {
@@ -53,7 +56,7 @@ export default function ProductsPage() {
   const getImageUrl = (path: string) => {
     if (!path) return '/images/placeholder-product.png';
     if (path.startsWith('http')) return path; 
-    return `http://localhost:5000/${path.replace(/\\/g, '/')}`; 
+    return `${BASE_URL}${path.replace(/\\/g, '/')}`; 
   };
 
   const filteredProducts = products.filter(product => {
@@ -78,7 +81,6 @@ export default function ProductsPage() {
 
   return (
     <>
-      {/* FILTER BAR */}
       <Navbar bg="light" variant="light" className="shadow-sm py-0" style={{ borderBottom: '1px solid #dee2e6' }}>
         <Container>
           <Nav className="flex-wrap">
@@ -106,14 +108,12 @@ export default function ProductsPage() {
             <Row className="g-4">
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => {
-                  // Gunakan _id dari MongoDB
                   const isFav = isFavorite(product._id);
 
                   return (
                     <Col key={product._id} lg={4} md={6}>
                       <Card className="border-0 shadow-sm h-100">
                         
-                        {/* Wrapper Gambar */}
                         <div className="position-relative product-image-wrapper" style={{ height: '250px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa' }}>
                           <Image 
                             src={getImageUrl(product.imageUrl)}
@@ -126,7 +126,6 @@ export default function ProductsPage() {
                             }}
                           />
                           
-                          {/* Tombol Aksi (Hati & Cart) */}
                           <div className="position-absolute top-0 end-0 m-3 d-flex gap-2">
                             <Button 
                               variant="light" 
@@ -162,7 +161,7 @@ export default function ProductsPage() {
                           </div>
                         </div>
 
-                        {/* Body Card */}
+
                         <Card.Body>
                           <p className="text-muted small mb-2">SKU : {product.sku}</p>
                           <Card.Title className="fw-bold mb-3 text-truncate">{product.name}</Card.Title>
@@ -171,7 +170,7 @@ export default function ProductsPage() {
                             <span className="fw-bold fs-5">
                               Rp {product.price.toLocaleString('id-ID')}
                             </span>
-                            {/* Menampilkan Stock sebagai pengganti 'pieces' */}
+
                             <span className="text-muted small">
                                 <Badge bg={product.stock > 0 ? "success" : "danger"}>
                                     {product.stock > 0 ? `${product.stock} in stock` : "Out of Stock"}
@@ -179,10 +178,9 @@ export default function ProductsPage() {
                             </span>
                           </div>
                           
-                          {/* Link Detail: Menggunakan _id */}
-                          <Button as={Link} href={`/products/${product._id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
+                          <Link href={`/products/${product._id}`} className="btn btn-dark w-100 rounded-3 fw-semibold">
                             View Details
-                          </Button>
+                          </Link>
                         </Card.Body>
                       </Card>
                     </Col>

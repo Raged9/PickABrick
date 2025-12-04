@@ -18,12 +18,12 @@ export default function DiscoverPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 2. Fungsi untuk Fetch Data dari Backend
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        // Request ke Backend Node.js (Port 5000)
-        const res = await fetch('http://localhost:5000/api/articles');
+        const res = await fetch(`${API_URL}/articles`);
         if (!res.ok) throw new Error('Gagal mengambil data');
         
         const data = await res.json();
@@ -39,12 +39,11 @@ export default function DiscoverPage() {
   }, []);
 
   const getImageUrl = (path: string) => {
-    if (!path) return '/images/placeholder-product.png'; // Gambar default
-    if (path.startsWith('http')) return path; // Jika Cloudinary, pakai langsung
-    return `http://localhost:5000${path}`; // Jika lokal, tambahkan host backend
+    if (!path) return '/images/placeholder-product.png';
+    if (path.startsWith('http')) return path;
+    return `${process.env.NEXT_PUBLIC_BASE_URL}${path.replace(/\\/g, '/')}`;
   };
 
-  // Tampilan Loading
   if (loading) {
     return (
       <Container className="d-flex vh-100 justify-content-center align-items-center">
@@ -60,10 +59,6 @@ export default function DiscoverPage() {
         <Container className="py-4">
           <div className="d-flex justify-content-between align-items-center mb-5">
             <h2 className="fw-bold mb-0">Discover Our Articles</h2>
-            {/* Tombol ini disembunyikan jika user bukan admin 
-            <Link href="/admin/article" className="btn btn-outline-dark rounded-pill">
-              Write Article
-            </Link> */}
           </div>
           
           <Row className="g-4">
@@ -71,7 +66,6 @@ export default function DiscoverPage() {
               articles.map((article) => (
                 <Col key={article._id} md={6} lg={4}>
                   <Card className="border-0 shadow-sm h-100 card-hover">
-                    {/* Gambar Artikel */}
                     <div style={{ position: 'relative', width: '100%', height: '250px' }}>
                       <Image
                         src={getImageUrl(article.thumbnail)}
@@ -82,7 +76,6 @@ export default function DiscoverPage() {
                           borderTopLeftRadius: '0.375rem', 
                           borderTopRightRadius: '0.375rem' 
                         }}
-                        // Jika gambar error/hilang, ganti ke placeholder
                         onError={(e) => {
                            e.currentTarget.srcset = '/images/placeholder-product.png';
                         }}
@@ -108,7 +101,6 @@ export default function DiscoverPage() {
                         {article.title}
                       </Card.Title>
                       
-                      {/* Tampilkan cuplikan konten (hapus tag HTML jika ada) */}
                       <Card.Text className="text-muted mb-4" style={{ 
                         display: '-webkit-box',
                         WebkitLineClamp: 3,
@@ -118,15 +110,13 @@ export default function DiscoverPage() {
                         {article.content.replace(/<[^>]+>/g, '')}
                       </Card.Text>
                       
-                      <Button 
-                        as={Link} 
-                        // Link ke Detail Page (Gunakan _id dari MongoDB)
-                        href={`/discover/${article._id}`} 
-                        variant="dark" 
-                        className="rounded-3 fw-semibold mt-auto w-100"
+                      <Link
+                        href={`/discover/${article._id}`}
+                        className="btn btn-dark rounded-3 fw-semibold mt-auto w-100"
+                        style={{ textDecoration: 'none' }}
                       >
                         Read More
-                      </Button>
+                      </Link>
                     </Card.Body>
                   </Card>
                 </Col>

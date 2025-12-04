@@ -36,10 +36,13 @@ export default function FavoritesPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/products');
+        const res = await fetch(`${API_URL}/products`);
         const data = await res.json();
         setAllProducts(data);
       } catch (error) {
@@ -69,7 +72,7 @@ export default function FavoritesPage() {
   const getImageUrl = (path: string) => {
     if (!path) return '/images/placeholder-product.png';
     if (path.startsWith('http')) return path;
-    return `http://localhost:5000/${path.replace(/\\/g, '/')}`;
+    return `${BASE_URL}${path.replace(/\\/g, '/')}`;
   };
 
   if (favoritesLoading || loadingData) {
@@ -161,9 +164,9 @@ export default function FavoritesPage() {
                             </span>
                           </div>
 
-                          <Button as={Link} href={`/products/${product._id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
+                          <Link href={`/products/${product._id}`} className="btn btn-dark w-100 rounded-3 fw-semibold">
                             View Details
-                          </Button>
+                          </Link>
                         </Card.Body>
                       </Card>
                     </Col>

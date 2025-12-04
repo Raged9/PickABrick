@@ -15,10 +15,10 @@ export default function TrendsPage() {
     const now = new Date();
     
     const [selectedYear, setSelectedYear] = useState(now.getFullYear());
-    const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1); // 1 = Januari
+    const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1); 
     
     const [stats, setStats] = useState({ totalStock: 0, totalUsers: 0, totalReviews: 0 });
-    const [daysLabels, setDaysLabels] = useState<number[]>([]); // Label tanggal dinamis (1-30/31)
+    const [daysLabels, setDaysLabels] = useState<number[]>([]); 
     
     const [lineChartData, setLineChartData] = useState({
         users: [],

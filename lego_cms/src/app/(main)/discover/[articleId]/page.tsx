@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation'; // Hook untuk ambil ID dari URL
+import { useParams } from 'next/navigation'; 
 import { Container, Row, Col, Badge, Button, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faUser, faArrowLeft } from '@fortawesome/free-solid-svg-icons';

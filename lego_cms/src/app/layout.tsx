@@ -2,7 +2,6 @@ import './globals.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 
-// Impor Provider (State Global)
 import { FavoritesProvider } from './(main)/contexts/FavoritesContext';
 import { AuthProvider } from './(main)/contexts/AuthContext';
 import { SearchProvider } from './(main)/contexts/SearchContext';

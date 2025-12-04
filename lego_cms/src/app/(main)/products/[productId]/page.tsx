@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Spinner, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faBagShopping, faShop } from '@fortawesome/free-solid-svg-icons'; // Icon Cart & Marketplace
+import { faShoppingCart, faBagShopping, faShop } from '@fortawesome/free-solid-svg-icons'; 
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import Image from 'next/image';

@@ -6,9 +6,9 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
         port: '',
-        pathname: '/**', // Izinkan semua path di Cloudinary
+        pathname: '/**',
       },
-      // (Opsional) Jika Anda masih pakai gambar lokal dari backend:
+
       {
         protocol: 'http',
         hostname: 'localhost',

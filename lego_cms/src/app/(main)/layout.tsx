@@ -31,13 +31,15 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
   const [msg, setMsg] = useState('');
   const [secret, setSecret] = useState('');
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   const handleDevModeClick = async () => {
     setMsg('');
     setToken('');
     
     if (user && !user.isTwoFactorEnabled) {
       try {
-        const res = await fetch('http://localhost:5000/api/setup-2fa', { 
+        const res = await fetch(`${API_URL}/setup-2fa`, { 
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ userId: user.id })
@@ -67,7 +69,7 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
     if (!user) return;
 
     try {
-      const res = await fetch('http://localhost:5000/api/verify-2fa', { 
+      const res = await fetch(`${API_URL}/verify-2fa`, { 
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ userId: user.id, token })
@@ -111,9 +113,9 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
           </Button>
         </InputGroup>
       
-        <Button as={Link} href="/favorites" variant="light" className="d-flex align-items-center justify-content-center shadow-sm" style={{width: '32px', height: '32px', borderRadius: '50%'}}>
+        <Link href="/favorites" className="btn btn-light shadow-sm rounded-circle d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
           <FontAwesomeIcon icon={faHeart} />
-        </Button>
+        </Link>
         
         {user ? (
           <div className="d-flex align-items-center gap-2">
@@ -130,12 +132,10 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
               </Button>
             )}
             
-            <Button 
-              as={Link}
-              href="/profile"
-              variant="light"
-              title="View Profile"
-              className="rounded-circle d-flex align-items-center justify-content-center"
+            <Link 
+              href="/profile" 
+              title="View Profile" 
+              className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
               style={{
                 width: '32px', 
                 height: '32px', 
@@ -147,12 +147,12 @@ function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
             >
               <Image 
                 src="/images/profile.png" 
-                alt={user.username}
-                width={22}
-                height={22}
-                style={{objectFit: 'cover', borderRadius: '50%'}}
+                alt={user.username} 
+                width={22} 
+                height={22} 
+                style={{objectFit: 'cover', borderRadius: '50%'}} 
               />
-            </Button>
+            </Link>
 
             <span className="fw-semibold text-dark d-none d-lg-block">
               {user.username}
@@ -406,16 +406,14 @@ export default function RootLayout({
                     </Col>
                     
                     <Col xs={12} md={10} className="mt-4">
-                      <Button 
-                        as={Link} 
+                      <Link 
                         href="/login" 
-                        variant="primary"
-                        className="w-100 rounded-pill fw-semibold"
+                        className="btn btn-primary w-100 rounded-pill fw-semibold"
                         style={{ padding: '0.75rem', fontSize: '1.1rem', backgroundColor: '#4A69E2', borderColor: '#4A69E2' }}
                         onClick={handleCloseLoginModal}
                       >
                         Sign In
-                      </Button>
+                      </Link>
                     </Col>
                     
                     <Col xs={12} className="mt-4">

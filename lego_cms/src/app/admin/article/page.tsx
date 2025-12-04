@@ -13,15 +13,16 @@ interface Article {
   createdAt: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function AdminDashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // 1. Fetch Semua Artikel
   const fetchArticles = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/articles');
+      const res = await fetch(`${API_URL}/articles`);
       const data = await res.json();
       setArticles(data);
     } catch (error) {
@@ -35,17 +36,15 @@ export default function AdminDashboard() {
     fetchArticles();
   }, []);
 
-  // 2. Fungsi Hapus (Delete)
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this article?')) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/articles/${id}`, {
+      const res = await fetch(`${API_URL}/articles/${id}`, {
         method: 'DELETE',
       });
 
       if (res.ok) {
-        // Refresh list tanpa reload halaman
         setArticles(prev => prev.filter(article => article._id !== id));
         alert('Article deleted!');
       } else {

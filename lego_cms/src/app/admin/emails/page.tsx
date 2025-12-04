@@ -14,10 +14,12 @@ export default function EmailsPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
     useEffect(() => {
         const fetchEmails = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/users');
+                const res = await fetch(`${API_URL}/users`);
                 const data = await res.json();
                 setUsers(data);
             } catch (error) {

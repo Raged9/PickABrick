@@ -9,36 +9,35 @@ import { Container, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faUserSecret } from '@fortawesome/free-solid-svg-icons';
 
-// Import Speakeasy/QR Logic tidak diperlukan di frontend sini, kita panggil API verify
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const { user, isLoading, isAdminUnlocked, unlockAdmin } = useAuth();
     const router = useRouter();
     
-    // State untuk Lock Screen
     const [token, setToken] = useState('');
     const [msg, setMsg] = useState('');
     const [verifying, setVerifying] = useState(false);
 
-    // 1. CEK OTORISASI DASAR (Role)
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
     useEffect(() => {
         if (!isLoading) {
             if (!user) {
-                router.push('/login'); // Belum login -> tendang ke login
+                router.push('/login');
             } else if (user.role !== 'admin') {
-                router.push('/'); // Bukan admin -> tendang ke home
+                router.push('/');
             }
         }
     }, [user, isLoading, router]);
 
-    // 2. FUNGSI VERIFIKASI 2FA (Dipanggil di Lock Screen)
     const handleVerify = async (e: React.FormEvent) => {
         e.preventDefault();
         setVerifying(true);
         setMsg('');
 
         try {
-            const res = await fetch('http://localhost:5000/api/verify-2fa', {
+            const res = await fetch(`${API_URL}/verify-2fa`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: user?.id, token })
@@ -47,7 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             const data = await res.json();
 
             if (res.ok && data.isValid) {
-                unlockAdmin(); // BUKA GERBANG!
+                unlockAdmin();
             } else {
                 setMsg('Invalid Token / Code Salah');
             }

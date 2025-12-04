@@ -38,15 +38,18 @@ export default function ProductDetailPage() {
 
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resDetail = await fetch(`http://localhost:5000/api/products/${productId}`);
+        const resDetail = await fetch(`${API_URL}/products/${productId}`);
         if (!resDetail.ok) throw new Error('Not found');
         const dataDetail = await resDetail.json();
         setProduct(dataDetail);
 
-        const resAll = await fetch('http://localhost:5000/api/products');
+        const resAll = await fetch(`${API_URL}/products`);
         const dataAll = await resAll.json();
         setAllProducts(dataAll);
       } catch (error) {
@@ -62,7 +65,7 @@ export default function ProductDetailPage() {
   const getImageUrl = (path: string) => {
     if (!path) return '/images/placeholder-product.png';
     if (path.startsWith('http')) return path;
-    return `http://localhost:5000/${path.replace(/\\/g, '/')}`;
+    return `${BASE_URL}/${path.replace(/\\/g, '/')}`;
   };
 
   if (loading) return <Container className="text-center py-5"><Spinner animation="border" /></Container>;
@@ -88,7 +91,6 @@ export default function ProductDetailPage() {
             </p>
             
             <Row className="g-5">
-              {/* KOLOM GAMBAR (Kiri) */}
               <Col lg={7}>
                 <div className="detail-image-wrapper p-4" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ position: 'relative', width: '100%', height: '500px' }}>
@@ -103,7 +105,6 @@ export default function ProductDetailPage() {
                 </div>
               </Col>
               
-              {/* KOLOM DETAIL (Kanan) */}
               <Col lg={5}>
                 <h1 className="fw-bold display-6">{product.name}</h1>
                 <p className="text-muted">SKU: {product.sku}</p>
@@ -127,7 +128,6 @@ export default function ProductDetailPage() {
                         Buy Now
                     </Button>
 
-                    {/* Tombol Favorite */}
                     <Button 
                         variant="light" 
                         className="border rounded-3 d-flex align-items-center justify-content-center"
@@ -209,9 +209,9 @@ export default function ProductDetailPage() {
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <span className="fw-bold fs-5">Rp {prod.price.toLocaleString('id-ID')}</span>
                           </div>
-                          <Button as={Link} href={`/products/${prod._id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
+                          <Link href={`/products/${prod._id}`} className="btn btn-dark w-100 rounded-3 fw-semibold">
                             View Details
-                          </Button>
+                          </Link>
                         </Card.Body>
                       </Card>
                     </Col>

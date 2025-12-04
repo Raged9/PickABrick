@@ -11,13 +11,16 @@ interface User {
     isActive: boolean;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchUsers = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/users');
+            const res = await fetch(`${API_URL}/users`);
             const data = await res.json();
             setUsers(data);
         } catch (error) {
@@ -34,7 +37,7 @@ export default function UsersPage() {
     const handleRoleChange = async (id: string, newRole: 'user' | 'admin') => {
         if(!confirm(`Are you sure you want to make this user ${newRole}?`)) return;
         try {
-            await fetch(`http://localhost:5000/api/users/${id}/role`, {
+            await fetch(`${API_URL}/users/${id}/role`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role: newRole })
@@ -47,7 +50,7 @@ export default function UsersPage() {
         const action = newStatus ? "Activate" : "Ban";
         if(!confirm(`Are you sure you want to ${action} this user?`)) return;
         try {
-            await fetch(`http://localhost:5000/api/users/${id}/status`, {
+            await fetch(`${API_URL}/users/${id}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ isActive: newStatus })
@@ -59,7 +62,7 @@ export default function UsersPage() {
     const handleDelete = async (id: string) => {
         if(!confirm('Are you sure? This action cannot be undone.')) return;
         try {
-            await fetch(`http://localhost:5000/api/users/${id}`, { method: 'DELETE' });
+            await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
             fetchUsers();
         } catch(err) { alert('Failed to delete user'); }
     };

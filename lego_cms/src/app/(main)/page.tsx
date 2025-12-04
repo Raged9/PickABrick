@@ -40,10 +40,13 @@ export default function Home() {
   
   const [stats, setStats] = useState({ totalStock: 0, totalUsers: 0, totalReviews: 0 });
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/products');
+        const res = await fetch(`${API_URL}/products`);
         const data = await res.json();
         
         setProducts(data.slice(0, 6));
@@ -67,7 +70,7 @@ export default function Home() {
   useEffect(() => {
     const fetchStats = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/stats');
+            const res = await fetch(`${API_URL}/stats`);
             const data = await res.json();
             setStats(data);
         } catch (error) {
@@ -80,7 +83,7 @@ export default function Home() {
   const getImageUrl = (path: string) => {
     if (!path) return '/images/placeholder-product.png';
     if (path.startsWith('http')) return path;
-    return `http://localhost:5000/${path.replace(/\\/g, '/')}`;
+    return `${BASE_URL}/${path.replace(/\\/g, '/')}`;
   };
 
   const HotDealCard = ({ product }: { product: Product }) => {
@@ -128,9 +131,9 @@ export default function Home() {
           </p>
           
           <div className="d-flex gap-3">
-            <Button as={Link} href={`/products/${product._id}`} variant="dark" className="rounded-pill px-4 py-2 fw-semibold flex-grow-1 flex-md-grow-0">
-                Grab it Now
-            </Button>
+            <Link href={`/products/${product._id}`} className="btn btn-dark rounded-pill px-4 py-2 fw-semibold flex-grow-1 flex-md-grow-0">
+              Grab it Now
+            </Link>
             <div className="text-success d-flex align-items-center">
                 <FontAwesomeIcon icon={faBox} className="me-2"/>
                 <span className="fw-bold">{product.stock} left</span>
@@ -228,9 +231,9 @@ export default function Home() {
               <h5 className="fw-bold">Newest Stock Arrivals</h5>
               <p className="text-muted mb-0">Latest LEGO Products in our inventory</p>
             </div>
-            <Button as={Link} href="/products" className="btn-yellow fw-semibold rounded-pill px-4">
+            <Link href="/products" className="btn btn-yellow fw-semibold rounded-pill px-4">
               See More »
-            </Button>
+            </Link>
           </div>
 
           {loading ? (
@@ -309,9 +312,9 @@ export default function Home() {
                                 {product.stock} pcs
                             </span>
                         </div>
-                        <Button as={Link} href={`/products/${product._id}`} variant="dark" className="w-100 rounded-3 fw-semibold">
-                            View Details
-                        </Button>
+                        <Link href={`/products/${product._id}`} className="btn btn-dark w-100 rounded-3 fw-semibold">
+                          View Details
+                        </Link>
                         </Card.Body>
                     </Card>
                     </Col>

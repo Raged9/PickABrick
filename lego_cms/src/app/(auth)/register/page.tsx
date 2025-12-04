@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { Container, Card, Form, Button, CloseButton, Alert } from 'react-bootstrap';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // <-- Import useRouter
+import { useRouter } from 'next/navigation';
 
-// --- Path Gambar Dekoratif ---
 const yellowBrickImg = '/images/studs.png';
 const redBrickImg = '/images/brickclean.png';
 const minifigureImg = '/images/legoman.png';
@@ -20,15 +19,16 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   
-  const router = useRouter(); // <-- Inisialisasi router
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // Validasi frontend sederhana
     if (password !== confirmPassword) {
       setError('Passwords do not match!');
       return;
@@ -37,7 +37,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/register', { // Panggil API
+      const res = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,15 +48,12 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // SUKSES
         setSuccess('Account created successfully! Redirecting to login...');
-        // Reset form
         setUsername('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
         
-        // Arahkan ke halaman login setelah 2 detik
         setTimeout(() => {
           router.push('/login');
         }, 2000);
@@ -78,7 +75,7 @@ export default function RegisterPage() {
       <Container 
         fluid 
         className=" d-flex align-items-center justify-content-center p-3 position-relative"
-        style={{ backgroundColor: '#f8f9fa' }} // Tambahkan background
+        style={{ backgroundColor: '#f8f9fa' }}
       >
         
         <Image src={yellowBrickImg} alt="Yellow brick" width={100} height={100} className="position-absolute d-none d-md-block" style={{ top: '10%', left: '15%', transform: 'rotate(30deg)', opacity: 0.9, zIndex: 1 }}/>

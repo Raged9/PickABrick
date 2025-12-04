@@ -6,21 +6,20 @@ import { useRouter } from 'next/navigation';
 export default function ArticlePage() {
     const router = useRouter();
     
-    // State untuk form
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [category, setCategory] = useState('News');
     const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
 
-    // Handle File Change
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setThumbnail(e.target.files[0]);
         }
     };
 
-    // Handle Submit
     const handleSubmit = async (status: 'draft' | 'published') => {
         if (!title || !content) {
             alert("Title and Content are required!");
@@ -29,7 +28,6 @@ export default function ArticlePage() {
 
         setLoading(true);
 
-        // Gunakan FormData untuk upload file
         const formData = new FormData();
         formData.append('title', title);
         formData.append('content', content);
@@ -40,8 +38,7 @@ export default function ArticlePage() {
         }
 
         try {
-            // URL Backend Anda
-            const res = await fetch('http://localhost:5000/api/articles', {
+            const res = await fetch(`${API_URL}/articles`, {
                 method: 'POST',
 
                 body: formData,
@@ -65,7 +62,6 @@ export default function ArticlePage() {
         <div className="container-fluid py-4">
             <h2 className="mb-4">Write New Article</h2>
             <div className="row">
-                {/* Kolom Kiri */}
                 <div className="col-lg-8">
                     <div className="card shadow-sm">
                         <div className="card-body">
@@ -111,7 +107,6 @@ export default function ArticlePage() {
                     </div>
                 </div>
                 
-                {/* Kolom Kanan */}
                 <div className="col-lg-4">
                     <div className="card shadow-sm mb-3">
                         <div className="card-header bg-light">Publishing Options</div>

@@ -3,9 +3,16 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { useAuth } from './AuthContext';
 
 interface Product {
-  _id?: string;
-  id?: string;
-  [key: string]: any;
+  _id: string;
+  sku: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  category: string;
+  stock: number;
+  tokopediaLink?: string;
+  shopeeLink?: string;
 }
 
 interface IFavoritesContext {

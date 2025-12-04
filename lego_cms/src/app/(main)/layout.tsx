@@ -15,11 +15,17 @@ const yellowBrickImg = '/images/studs.png';
 const redBrickImg = '/images/brickclean.png';
 const minifigureImg = '/images/legoman.png';
 
+// [BARU] Tambahkan path image logo marketplace disini
+// Pastikan file gambar sudah ada di folder public/images/
+const tokpedImg = '/images/tokopedia.png'; 
+const shopeeImg = '/images/shopee.png';
+
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SearchProvider, useSearch } from './contexts/SearchContext';
 
 function AuthNavArea({ onShowLoginModal }: { onShowLoginModal: () => void }) {
+  // ... (Kode AuthNavArea tidak berubah, tetap sama seperti sebelumnya)
   const { user, updateUser } = useAuth();
   const { searchTerm, setSearchTerm } = useSearch();
   const router = useRouter();
@@ -284,7 +290,7 @@ export default function RootLayout({
                 <Nav className="me-auto ms-5">
                   <Nav.Link as={Link} href="/products" className="fw-semibold text-dark">PRODUCTS</Nav.Link>
                   <Nav.Link as={Link} href="/discover" className="fw-semibold text-dark">DISCOVER</Nav.Link>
-                  <Nav.Link href="#hot-deals" className="fw-semibold text-dark">DEALS</Nav.Link>
+                  <Nav.Link href="/#hot-deals" className="fw-semibold text-dark">DEALS</Nav.Link>
                 </Nav>
                   
                   <AuthNavArea onShowLoginModal={handleShowLoginModal} />
@@ -322,7 +328,7 @@ export default function RootLayout({
                 </Col>
                 <Col lg={3} md={6}>
                   <h6 className="fw-bold mb-3">Follow Us</h6>
-                  <div className="d-flex gap-2">
+                  <div className="d-flex gap-2 flex-wrap mb-3">
                     <Button variant="outline-light" className="rounded-circle d-flex align-items-center justify-content-center" style={{width: '40px', height: '40px'}}>
                       <FontAwesomeIcon icon={faFacebook} />
                     </Button>
@@ -336,10 +342,49 @@ export default function RootLayout({
                       <FontAwesomeIcon icon={faYoutube} />
                     </Button>
                   </div>
+
+                  <h6 className="fw-bold mb-2 pt-2">Our Store</h6>
+                  <div className="d-flex gap-2">
+                    <Link href="https://www.tokopedia.com/archive-blinksquad-1639270251" target="_blank" passHref legacyBehavior>
+                        <Button 
+                            variant="outline-light" 
+                            className="rounded-circle d-flex align-items-center justify-content-center p-0 overflow-hidden bg-white border-0" 
+                            style={{width: '40px', height: '40px'}}
+                            title="Visit our Tokopedia"
+                        >
+                            <Image 
+                                src={tokpedImg} 
+                                alt="Tokopedia" 
+                                width={28} 
+                                height={28} 
+                                style={{objectFit: 'contain'}} 
+                                onError={(e) => { e.currentTarget.style.display='none'; }}
+                            />
+                        </Button>
+                    </Link>
+
+                    <Link href="https://shopee.co.id/og6fuoe4nb?categoryId=100639&entryPoint=ShopByPDP&itemId=43570302391" target="_blank" passHref legacyBehavior>
+                        <Button 
+                            variant="outline-light" 
+                            className="rounded-circle d-flex align-items-center justify-content-center p-0 overflow-hidden bg-white border-0" 
+                            style={{width: '40px', height: '40px'}}
+                            title="Visit our Shopee"
+                        >
+                            <Image 
+                                src={shopeeImg} 
+                                alt="Shopee" 
+                                width={28} 
+                                height={28} 
+                                style={{objectFit: 'contain'}} 
+                                onError={(e) => { e.currentTarget.style.display='none'; }}
+                            />
+                        </Button>
+                    </Link>
+                  </div>
                 </Col>
               </Row>
               <hr className="my-4 bg-white opacity-25" />
-              <p className="text-center text-white-50 mb-0">© 2024 Pick A Brick. All rights reserved.</p>
+              <p className="text-center text-white-50 mb-0">© 2025 Pick A Brick. All rights reserved.</p>
             </Container>
 
             <Modal

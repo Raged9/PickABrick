@@ -98,35 +98,29 @@ export default function RegisterPage() {
             </h2>
             
             <Form onSubmit={handleSubmit}>
-              {/* Tampilkan pesan Error atau Sukses */}
               {error && <Alert variant="danger">{error}</Alert>}
               {success && <Alert variant="success">{success}</Alert>}
 
-              {/* Field Email */}
               <Form.Group className="mb-3" controlId="registerEmail">
                 <Form.Label className="fw-semibold" style={{ color: '#555', fontSize: '0.9rem' }}>Active Email</Form.Label>
                 <Form.Control type="email" placeholder="Enter your email here..." value={email} onChange={(e) => setEmail(e.target.value)} required className="rounded-3" style={{ padding: '0.9rem 1rem', border: '2px solid #ced4da' }} />
               </Form.Group>
 
-              {/* Field Username */}
               <Form.Group className="mb-3" controlId="registerUsername">
                 <Form.Label className="fw-semibold" style={{ color: '#555', fontSize: '0.9rem' }}>Username</Form.Label>
                 <Form.Control type="text" placeholder="Enter your username..." value={username} onChange={(e) => setUsername(e.target.value)} required minLength={3} className="rounded-3" style={{ padding: '0.9rem 1rem', border: '2px solid #ced4da' }} />
               </Form.Group>
 
-              {/* Field Password */}
               <Form.Group className="mb-3" controlId="registerPassword">
                 <Form.Label className="fw-semibold" style={{ color: '#555', fontSize: '0.9rem' }}>Password</Form.Label>
                 <Form.Control type="password" placeholder="Enter your password here..." value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="rounded-3" style={{ padding: '0.9rem 1rem', border: '2px solid #ced4da' }} />
               </Form.Group>
 
-              {/* Field Confirm Password */}
               <Form.Group className="mb-4" controlId="confirmPassword">
                 <Form.Label className="fw-semibold" style={{ color: '#555', fontSize: '0.9rem' }}>Confirm Password</Form.Label>
                 <Form.Control type="password" placeholder="Confirm your password..." value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="rounded-3" style={{ padding: '0.9rem 1rem', border: '2px solid #ced4da' }} />
               </Form.Group>
 
-              {/* Tombol Submit */}
               <Button 
                 type="submit"
                 className="w-100 fw-bold rounded-3"

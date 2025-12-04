@@ -40,13 +40,11 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // SUKSES
         login(data.user);
         console.log('Login successful:', data);
         router.push('/'); 
 
       } else {
-        // GAGAL
         setError(data.message || 'Login failed.');
       }
     } catch (err: any) {
@@ -65,12 +63,10 @@ export default function LoginPage() {
         style={{ backgroundColor: '#f8f9fa', overflow: 'hidden' }}
       >
         
-        {/* === GAMBAR DEKORATIF === */}
         <Image src={yellowBrickImg} alt="Yellow brick" width={100} height={100} className="position-absolute d-none d-md-block" style={{ top: '10%', left: '15%', transform: 'rotate(30deg)', opacity: 0.9, zIndex: 1 }}/>
         <Image src={redBrickImg} alt="Red brick" width={170} height={100} className="position-absolute d-none d-md-block" style={{ bottom: '5%', left: '10%', transform: 'rotate(-5deg)', zIndex: 1 }}/>
         <Image src={minifigureImg} alt="Minifigure" width={220} height={320} className="position-absolute d-none d-lg-block" style={{ bottom: '0%', right: '10%', transform: 'rotate(10deg)', zIndex: 1 }}/>
 
-        {/* === KARTU LOGIN === */}
         <Card 
           className="border-0 rounded-4 shadow-lg"
           style={{ width: '100%', maxWidth: '480px', zIndex: 2, position: 'relative' }}
@@ -88,10 +84,8 @@ export default function LoginPage() {
             
             <Form onSubmit={handleSubmit}>
               
-              {/* Tampilkan pesan Error jika ada */}
               {error && <Alert variant="danger">{error}</Alert>}
 
-              {/* Field Email */}
               <Form.Group className="mb-3" controlId="loginEmail">
                 <Form.Label className="fw-semibold" style={{ color: '#555', fontSize: '0.9rem' }}>
                   Active Email
@@ -107,7 +101,6 @@ export default function LoginPage() {
                 />
               </Form.Group>
 
-              {/* Field Password */}
               <Form.Group className="mb-4" controlId="loginPassword">
                 <Form.Label className="fw-semibold" style={{ color: '#555', fontSize: '0.9rem' }}>
                   Password
@@ -123,7 +116,6 @@ export default function LoginPage() {
                 />
               </Form.Group>
 
-              {/* Tombol Submit */}
               <Button 
                 type="submit"
                 className="w-100 fw-bold rounded-3"
@@ -133,7 +125,7 @@ export default function LoginPage() {
                   fontSize: '1.1rem',
                   padding: '0.8rem 0'
                 }}
-                disabled={isLoading} // Nonaktifkan tombol saat loading
+                disabled={isLoading} 
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>

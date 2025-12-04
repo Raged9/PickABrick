@@ -6,7 +6,6 @@ import { Spinner, Modal, Button, Form, Table, InputGroup } from 'react-bootstrap
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faSearch } from '@fortawesome/free-solid-svg-icons';
 
-// Tipe data sesuai MongoDB
 interface Product {
     _id: string;
     sku: string;
@@ -172,7 +171,6 @@ export default function StocksPage() {
                                                 style={{objectFit: 'contain', padding: '15px'}}
                                                 onError={(e) => e.currentTarget.srcset = '/images/placeholder-product.png'}
                                             />
-                                            {/* Badge Discount */}
                                             {(product.discount || 0) > 0 && (
                                                 <span className="position-absolute top-0 start-0 m-2 badge bg-danger">
                                                     Sale {product.discount}%
@@ -218,7 +216,6 @@ export default function StocksPage() {
                 <Form onSubmit={handleSaveProduct}>
                     <Modal.Body>
                         <div className="row g-3">
-                            {/* Nama & SKU */}
                             <div className="col-md-8">
                                 <Form.Label>Product Name</Form.Label>
                                 <Form.Control type="text" name="name" value={editingProduct?.name || ''} onChange={handleChange} required />
@@ -228,13 +225,11 @@ export default function StocksPage() {
                                 <Form.Control type="text" name="sku" value={editingProduct?.sku || ''} onChange={handleChange} required />
                             </div>
 
-                            {/* Description */}
                             <div className="col-12">
                                 <Form.Label>Description</Form.Label>
                                 <Form.Control as="textarea" rows={3} name="description" value={editingProduct?.description || ''} onChange={handleChange} />
                             </div>
 
-                            {/* Harga, Stock, Discount */}
                             <div className="col-md-4">
                                 <Form.Label>Price (Rp)</Form.Label>
                                 <Form.Control type="number" name="price" value={editingProduct?.price || ''} onChange={handleChange} required />
@@ -248,7 +243,6 @@ export default function StocksPage() {
                                 <Form.Control type="number" name="discount" value={editingProduct?.discount || ''} onChange={handleChange} />
                             </div>
 
-                            {/* Category */}
                             <div className="col-md-6">
                                 <Form.Label>Category</Form.Label>
                                 <Form.Select name="category" value={editingProduct?.category || 'Modular'} onChange={handleChange}>
@@ -262,7 +256,6 @@ export default function StocksPage() {
                                 </Form.Select>
                             </div>
 
-                            {/* Image Upload */}
                             <div className="col-md-6">
                                 <Form.Label>Product Image</Form.Label>
                                 <Form.Control type="file" accept="image/*" onChange={(e: any) => setImageFile(e.target.files[0])} />

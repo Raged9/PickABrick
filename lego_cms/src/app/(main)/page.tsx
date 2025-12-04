@@ -325,7 +325,7 @@ export default function Home() {
         </Container>
       </section>
 
-      <section className="bg-light py-5">
+      <section className="bg-light py-5" id="hot-deals">
         <Container className="py-4">
           <h2 className="text-center fw-bold mb-5">
             <span style={{ color: '#d9534f' }}>Hot Deals!</span> Biggest Discounts
@@ -373,23 +373,6 @@ export default function Home() {
               )}
             </>
           )}
-        </Container>
-      </section>
-
-      <section className="bg-yellow py-5">
-        <Container className="text-center py-4">
-          <h3 className="fw-bold mb-4">Subscribe to our newsletter for exclusive deals and new arrivals</h3>
-          <div className="d-flex justify-content-center gap-3 flex-wrap">
-            <Form.Control 
-              type="email" 
-              placeholder="Enter your email here..." 
-              className="rounded-3"
-              style={{maxWidth: '400px'}} 
-            />
-            <Button className="bg-navy text-white fw-semibold rounded-3 px-4 border-0">
-              Subscribe
-            </Button>
-          </div>
         </Container>
       </section>
     </>

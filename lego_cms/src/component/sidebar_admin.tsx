@@ -10,17 +10,15 @@ interface SideBarAdminProps {
 export default function SideBarAdmin({ children }: SideBarAdminProps) {
     const pathname = usePathname();
 
-    // Function simple untuk cek active
+
     const isActive = (path: string) => pathname === path ? "active" : "";
 
     return (
         <div className="container-fluid">
             <div className="row flex-nowrap">
-                {/* Sidebar Background Color */}
                 <div className="col-auto col-md-3 col-xl-2 px-sm-2 px-0" style={{backgroundColor: '#0F0A3C'}}>
                     <div className="d-flex flex-column px-3 pt-4 text-white min-vh-100">
                         
-                        {/* Menu List */}
                         <ul className="nav nav-pills flex-column mb-sm-auto mb-0 w-100" id="menu">
                             
                             <li className="nav-item w-100">
@@ -62,7 +60,6 @@ export default function SideBarAdmin({ children }: SideBarAdminProps) {
                     </div>
                 </div>
 
-                {/* Content Area */}
                 <div className="col py-3 bg-light">
                     {children}
                 </div>

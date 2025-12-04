@@ -3,7 +3,8 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { useAuth } from './AuthContext';
 
 interface Product {
-  id: string;
+  _id?: string;
+  id?: string;
   [key: string]: any;
 }
 

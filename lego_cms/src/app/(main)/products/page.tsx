@@ -136,7 +136,7 @@ export default function ProductsPage() {
                                   await removeFavorite(product._id);
                                 } else {
                                   await addFavorite({
-                                      id: product._id,
+                                      _id: product._id,
                                       name: product.name,
                                       price: String(product.price), 
                                       image: product.imageUrl,
@@ -144,7 +144,7 @@ export default function ProductsPage() {
                                       pieces: String(product.stock),
                                       category: product.category,
                                       description: product.description
-                                  });
+                                  } as any);
                                 }
                               }}
                             >

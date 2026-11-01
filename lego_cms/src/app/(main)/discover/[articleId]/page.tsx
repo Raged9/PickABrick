@@ -1,12 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation'; 
-import { Container, Row, Col, Badge, Button, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Badge, Button, Spinner, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faUser, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faUser, faArrowLeft, faEye, faHeart, faComment } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuth } from '../../contexts/AuthContext';
+
+interface ArticleComment {
+  _id?: string;
+  user: string;
+  text: string;
+  createdAt: string;
+}
 
 interface Article {
   _id: string;
@@ -15,14 +23,23 @@ interface Article {
   category: string;
   thumbnail: string;
   createdAt: string;
+  views?: number;
+  likes?: number;
+  likedBy?: string[];
+  comments?: ArticleComment[];
 }
 
 export default function ArticleDetailPage() {
   const params = useParams();
   const articleId = params.articleId;
+  const { user } = useAuth();
 
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const hasViewedRef = useRef<string | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -34,17 +51,26 @@ export default function ArticleDetailPage() {
   };
 
   useEffect(() => {
-    if (!articleId) return;
+    if (!articleId || hasViewedRef.current === String(articleId)) return;
+    hasViewedRef.current = String(articleId);
 
     const fetchArticle = async () => {
       try {
-        const res = await fetch(`${API_URL}/articles/${articleId}`);
+        const res = await fetch(`${API_URL}/articles/${articleId}/view`, {
+          method: 'POST',
+        });
         
         if (!res.ok) {
+          const fallbackRes = await fetch(`${API_URL}/articles/${articleId}`);
+          if (!fallbackRes.ok) {
             setArticle(null);
-        } else {
-            const data = await res.json();
+          } else {
+            const data = await fallbackRes.json();
             setArticle(data);
+          }
+        } else {
+          const data = await res.json();
+          setArticle(data);
         }
       } catch (error) {
         console.error('Error fetching article:', error);
@@ -55,6 +81,48 @@ export default function ArticleDetailPage() {
 
     fetchArticle();
   }, [articleId]);
+
+  const handleLike = async () => {
+    if (!article) return;
+    try {
+      const res = await fetch(`${API_URL}/articles/${article._id}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user?.id || null }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setArticle(updated);
+      }
+    } catch (error) {
+      console.error('Error liking article:', error);
+    }
+  };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!article || !commentText.trim()) return;
+    setSubmittingComment(true);
+    try {
+      const res = await fetch(`${API_URL}/articles/${article._id}/comment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user: user?.username || 'Guest',
+          text: commentText.trim(),
+        }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setArticle(updated);
+        setCommentText('');
+      }
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -101,8 +169,8 @@ export default function ArticleDetailPage() {
                 
                 <h1 className="fw-bold display-5 mb-4">{article.title}</h1>
                 
-                <div className="d-flex align-items-center text-muted">
-                  <div className="d-flex align-items-center me-4">
+                <div className="d-flex flex-wrap align-items-center text-muted gap-4">
+                  <div className="d-flex align-items-center">
                     <FontAwesomeIcon icon={faCalendar} className="me-2" />
                     <span>
                       {new Date(article.createdAt).toLocaleDateString('en-US', {
@@ -115,6 +183,28 @@ export default function ArticleDetailPage() {
                   <div className="d-flex align-items-center">
                     <FontAwesomeIcon icon={faUser} className="me-2" />
                     <span>Admin</span>
+                  </div>
+                  <div className="d-flex align-items-center" title="Views">
+                    <FontAwesomeIcon icon={faEye} className="me-2" />
+                    <span>{article.views ?? 0}</span>
+                  </div>
+                  <div
+                    className="d-flex align-items-center"
+                    style={{ cursor: 'pointer' }}
+                    onClick={handleLike}
+                    title="Click to Like"
+                  >
+                    <FontAwesomeIcon icon={faHeart} className="me-2 text-danger" />
+                    <span>{article.likes ?? 0}</span>
+                  </div>
+                  <div
+                    className="d-flex align-items-center"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setShowComments(!showComments)}
+                    title="Click to view/add comments"
+                  >
+                    <FontAwesomeIcon icon={faComment} className="me-2" />
+                    <span>{article.comments?.length ?? 0}</span>
                   </div>
                 </div>
               </header>
@@ -136,6 +226,45 @@ export default function ArticleDetailPage() {
               >
                 {article.content}
               </div>
+
+              {showComments && (
+                <div className="mt-5 pt-4 border-top">
+                  <h5 className="fw-bold mb-3">
+                    <FontAwesomeIcon icon={faComment} className="me-2" />
+                    Comments ({article.comments?.length ?? 0})
+                  </h5>
+                  <Form onSubmit={handleCommentSubmit} className="mb-4">
+                    <div className="d-flex gap-2">
+                      <Form.Control
+                        type="text"
+                        placeholder="Write a comment..."
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                      />
+                      <Button type="submit" variant="dark" disabled={submittingComment}>
+                        {submittingComment ? 'Posting...' : 'Post'}
+                      </Button>
+                    </div>
+                  </Form>
+                  {article.comments && article.comments.length > 0 ? (
+                    <div className="d-flex flex-column gap-3">
+                      {article.comments.map((c, idx) => (
+                        <div key={c._id || idx} className="p-3 bg-light rounded-3">
+                          <div className="d-flex justify-content-between mb-1">
+                            <strong className="small">{c.user}</strong>
+                            <small className="text-muted">
+                              {new Date(c.createdAt).toLocaleDateString('id-ID')}
+                            </small>
+                          </div>
+                          <p className="mb-0 small">{c.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted small">No comments yet.</p>
+                  )}
+                </div>
+              )}
 
               <hr className="my-5" />
 

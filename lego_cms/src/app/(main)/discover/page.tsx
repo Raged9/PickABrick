@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Badge } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faHeart, faComment } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -12,6 +14,9 @@ interface Article {
   category: string;
   thumbnail: string;
   createdAt: string;
+  views?: number;
+  likes?: number;
+  comments?: { user: string; text: string; createdAt: string }[];
 }
 
 export default function DiscoverPage() {
@@ -89,13 +94,29 @@ export default function DiscoverPage() {
                     </div>
 
                     <Card.Body className="d-flex flex-column p-4">
-                      <small className="text-muted mb-2">
-                        {new Date(article.createdAt).toLocaleDateString('id-ID', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </small>
+                      <div className="d-flex justify-content-between align-items-center mb-2">
+                        <small className="text-muted">
+                          {new Date(article.createdAt).toLocaleDateString('id-ID', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </small>
+                        <div className="d-flex align-items-center gap-3 text-muted small">
+                          <span title="Views">
+                            <FontAwesomeIcon icon={faEye} className="me-1" />
+                            {article.views ?? 0}
+                          </span>
+                          <span title="Likes">
+                            <FontAwesomeIcon icon={faHeart} className="me-1 text-danger" />
+                            {article.likes ?? 0}
+                          </span>
+                          <span title="Comments">
+                            <FontAwesomeIcon icon={faComment} className="me-1" />
+                            {article.comments?.length ?? 0}
+                          </span>
+                        </div>
+                      </div>
                       
                       <Card.Title className="fw-bold mb-3 fs-5">
                         {article.title}

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Container, Table, Button, Badge, Spinner } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faHeart, faComment } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +13,9 @@ interface Article {
   category: string;
   status: string;
   createdAt: string;
+  views?: number;
+  likes?: number;
+  comments?: { user: string; text: string; createdAt: string }[];
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -74,6 +79,7 @@ export default function AdminDashboard() {
                 <th className="p-3">Title</th>
                 <th className="p-3">Category</th>
                 <th className="p-3">Status</th>
+                <th className="p-3">Stats</th>
                 <th className="p-3">Date</th>
                 <th className="p-3 text-end">Actions</th>
               </tr>
@@ -87,6 +93,22 @@ export default function AdminDashboard() {
                     <Badge bg={article.status === 'published' ? 'success' : 'secondary'}>
                       {article.status}
                     </Badge>
+                  </td>
+                  <td className="p-3 text-muted small">
+                    <div className="d-flex align-items-center gap-3">
+                      <span title="Views">
+                        <FontAwesomeIcon icon={faEye} className="me-1" />
+                        {article.views ?? 0}
+                      </span>
+                      <span title="Likes">
+                        <FontAwesomeIcon icon={faHeart} className="me-1 text-danger" />
+                        {article.likes ?? 0}
+                      </span>
+                      <span title="Comments">
+                        <FontAwesomeIcon icon={faComment} className="me-1" />
+                        {article.comments?.length ?? 0}
+                      </span>
+                    </div>
                   </td>
                   <td className="p-3 text-muted">
                     {new Date(article.createdAt).toLocaleDateString()}

@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVideo, faImage, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { getYouTubeVideoId } from '@/component/VideoThumbnailPlayer';
 
 export default function ArticlePage() {
     const router = useRouter();
@@ -9,6 +12,8 @@ export default function ArticlePage() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [category, setCategory] = useState('News');
+    const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
+    const [videoUrl, setVideoUrl] = useState('');
     const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -16,7 +21,11 @@ export default function ArticlePage() {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setThumbnail(e.target.files[0]);
+            const file = e.target.files[0];
+            setThumbnail(file);
+            if (file.type.startsWith('video/')) {
+                setMediaType('video');
+            }
         }
     };
 
@@ -33,6 +42,8 @@ export default function ArticlePage() {
         formData.append('content', content);
         formData.append('category', category);
         formData.append('status', status);
+        formData.append('mediaType', mediaType);
+        formData.append('videoUrl', videoUrl);
         if (thumbnail) {
             formData.append('thumbnail', thumbnail);
         }
@@ -40,7 +51,6 @@ export default function ArticlePage() {
         try {
             const res = await fetch(`${API_URL}/articles`, {
                 method: 'POST',
-
                 body: formData,
             });
 
@@ -48,7 +58,8 @@ export default function ArticlePage() {
                 alert(`Article ${status} successfully!`);
                 router.push('/admin/article');
             } else {
-                alert('Failed to save article');
+                const errData = await res.json().catch(() => ({}));
+                alert('Failed to save article: ' + (errData.message || 'Unknown error'));
             }
         } catch (error) {
             console.error(error);
@@ -58,13 +69,15 @@ export default function ArticlePage() {
         }
     };
 
+    const previewYtId = videoUrl ? getYouTubeVideoId(videoUrl) : null;
+
     return (
         <div className="container-fluid py-4">
-            <h2 className="mb-4">Write New Article</h2>
+            <h2 className="mb-4 fw-bold">Write New Article</h2>
             <div className="row">
                 <div className="col-lg-8">
-                    <div className="card shadow-sm">
-                        <div className="card-body">
+                    <div className="card shadow-sm border-0 mb-4">
+                        <div className="card-body p-4">
                             <div className="mb-3">
                                 <label className="form-label fw-bold">Article Title</label>
                                 <input 
@@ -72,7 +85,7 @@ export default function ArticlePage() {
                                     className="form-control form-control-lg" 
                                     placeholder="Enter title here..." 
                                     value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
+                                    onChange={(e) => setTitle(e.target.value)} 
                                 />
                             </div>
                             
@@ -80,22 +93,24 @@ export default function ArticlePage() {
                                 <label className="form-label fw-bold">Content</label>
                                 <textarea 
                                     className="form-control" 
-                                    rows={15} 
+                                    rows={14} 
                                     placeholder="Start writing your article..."
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
                                 ></textarea>
                             </div>
 
-                            <div className="d-flex justify-content-end gap-2">
+                            <div className="d-flex justify-content-end gap-2 pt-2">
                                 <button 
-                                    className="btn btn-secondary" 
+                                    type="button"
+                                    className="btn btn-secondary px-4" 
                                     onClick={() => handleSubmit('draft')}
                                     disabled={loading}
                                 >
                                     {loading ? 'Saving...' : 'Save Draft'}
                                 </button>
                                 <button 
+                                    type="button"
                                     className="btn btn-primary px-4" 
                                     onClick={() => handleSubmit('published')}
                                     disabled={loading}
@@ -108,34 +123,99 @@ export default function ArticlePage() {
                 </div>
                 
                 <div className="col-lg-4">
-                    <div className="card shadow-sm mb-3">
-                        <div className="card-header bg-light">Publishing Options</div>
+                    {/* Media Type Selection */}
+                    <div className="card shadow-sm border-0 mb-3">
+                        <div className="card-header bg-light fw-bold">Thumbnail & Media Type</div>
                         <div className="card-body">
                             <div className="mb-3">
-                                <label className="form-label">Category</label>
+                                <label className="form-label small fw-semibold">Choose Media Format:</label>
+                                <div className="btn-group w-100" role="group">
+                                    <button
+                                        type="button"
+                                        className={`btn btn-sm ${mediaType === 'image' ? 'btn-dark' : 'btn-outline-secondary'}`}
+                                        onClick={() => setMediaType('image')}
+                                    >
+                                        <FontAwesomeIcon icon={faImage} className="me-1" /> Image
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`btn btn-sm ${mediaType === 'video' ? 'btn-danger' : 'btn-outline-secondary'}`}
+                                        onClick={() => setMediaType('video')}
+                                    >
+                                        <FontAwesomeIcon icon={faVideo} className="me-1" /> Video
+                                    </button>
+                                </div>
+                            </div>
+
+                            {mediaType === 'video' && (
+                                <div className="mb-3 p-3 bg-light rounded border border-danger-subtle">
+                                    <label className="form-label fw-bold small text-danger d-flex align-items-center gap-1">
+                                        <FontAwesomeIcon icon={faPlay} /> Video URL (YouTube / Direct MP4)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="form-control form-control-sm mb-2"
+                                        placeholder="e.g. https://www.youtube.com/watch?v=..."
+                                        value={videoUrl}
+                                        onChange={(e) => setVideoUrl(e.target.value)}
+                                    />
+                                    <small className="text-muted d-block mb-2">
+                                        Masukkan link YouTube atau direct URL file video.
+                                    </small>
+
+                                    {/* Live Video Preview */}
+                                    {previewYtId && (
+                                        <div className="rounded overflow-hidden mb-2" style={{ aspectRatio: '16/9' }}>
+                                            <iframe
+                                                src={`https://www.youtube.com/embed/${previewYtId}`}
+                                                style={{ width: '100%', height: '100%', border: 'none' }}
+                                                title="Preview"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <div className="mb-3">
+                                <label className="form-label fw-semibold small">
+                                    {mediaType === 'video' ? 'Cover Poster / Upload Video File' : 'Thumbnail Image'}
+                                </label>
+                                <input 
+                                    type="file" 
+                                    className="form-control form-control-sm" 
+                                    accept={mediaType === 'video' ? 'image/*,video/*' : 'image/*'}
+                                    onChange={handleFileChange}
+                                />
+                                <small className="text-muted">
+                                    {mediaType === 'video' 
+                                        ? 'Upload file cover gambar atau file video (MP4/WebM).' 
+                                        : 'Upload file gambar (JPG, PNG, WebP).'}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Publishing Options */}
+                    <div className="card shadow-sm border-0 mb-3">
+                        <div className="card-header bg-light fw-bold">Publishing Options</div>
+                        <div className="card-body">
+                            <div className="mb-3">
+                                <label className="form-label fw-semibold small">Category</label>
                                 <select 
-                                    className="form-select"
+                                    className="form-select form-select-sm"
                                     value={category}
                                     onChange={(e) => setCategory(e.target.value)}
                                 >
                                     <option value="News">News</option>
                                     <option value="Tutorial">Tutorial</option>
                                     <option value="Review">Review</option>
+                                    <option value="Video">Video Spotlight</option>
                                 </select>
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">Thumbnail Image</label>
-                                <input 
-                                    type="file" 
-                                    className="form-control" 
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }

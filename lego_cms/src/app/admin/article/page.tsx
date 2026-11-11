@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Container, Table, Button, Badge, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faHeart, faComment } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faHeart, faComment, faVideo, faImage } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { isArticleVideo } from '@/component/VideoThumbnailPlayer';
 
 interface Article {
   _id: string;
@@ -13,6 +14,9 @@ interface Article {
   category: string;
   status: string;
   createdAt: string;
+  thumbnail?: string;
+  videoUrl?: string;
+  mediaType?: 'image' | 'video';
   views?: number;
   likes?: number;
   comments?: { user: string; text: string; createdAt: string }[];
@@ -65,7 +69,7 @@ export default function AdminDashboard() {
   return (
     <Container className="py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold">Admin Dashboard</h2>
+        <h2 className="fw-bold">Admin Dashboard - Articles</h2>
         <Link href="/admin/article_new" className="btn btn-primary">
           + Create New Article
         </Link>
@@ -77,6 +81,7 @@ export default function AdminDashboard() {
             <thead className="bg-light">
               <tr>
                 <th className="p-3">Title</th>
+                <th className="p-3">Type</th>
                 <th className="p-3">Category</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Stats</th>
@@ -85,51 +90,69 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {articles.map((article) => (
-                <tr key={article._id} style={{ verticalAlign: 'middle' }}>
-                  <td className="p-3 fw-semibold">{article.title}</td>
-                  <td className="p-3"><Badge bg="info">{article.category}</Badge></td>
-                  <td className="p-3">
-                    <Badge bg={article.status === 'published' ? 'success' : 'secondary'}>
-                      {article.status}
-                    </Badge>
-                  </td>
-                  <td className="p-3 text-muted small">
-                    <div className="d-flex align-items-center gap-3">
-                      <span title="Views">
-                        <FontAwesomeIcon icon={faEye} className="me-1" />
-                        {article.views ?? 0}
-                      </span>
-                      <span title="Likes">
-                        <FontAwesomeIcon icon={faHeart} className="me-1 text-danger" />
-                        {article.likes ?? 0}
-                      </span>
-                      <span title="Comments">
-                        <FontAwesomeIcon icon={faComment} className="me-1" />
-                        {article.comments?.length ?? 0}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-3 text-muted">
-                    {new Date(article.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="p-3 text-end">
-                    <Link 
-                      href={`/admin/article/${article._id}`} 
-                      className="btn btn-sm btn-outline-primary me-2"
-                    >
-                      Edit
-                    </Link>
-                    <Button 
-                      variant="outline-danger" 
-                      size="sm"
-                      onClick={() => handleDelete(article._id)}
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {articles.map((article) => {
+                const isVideo = isArticleVideo(article);
+                return (
+                  <tr key={article._id} style={{ verticalAlign: 'middle' }}>
+                    <td className="p-3 fw-semibold">
+                      <div className="d-flex align-items-center gap-2">
+                        <span>{article.title}</span>
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      {isVideo ? (
+                        <Badge bg="danger" className="d-inline-flex align-items-center gap-1">
+                          <FontAwesomeIcon icon={faVideo} /> Video
+                        </Badge>
+                      ) : (
+                        <Badge bg="secondary" className="d-inline-flex align-items-center gap-1">
+                          <FontAwesomeIcon icon={faImage} /> Image
+                        </Badge>
+                      )}
+                    </td>
+                    <td className="p-3"><Badge bg="info">{article.category}</Badge></td>
+                    <td className="p-3">
+                      <Badge bg={article.status === 'published' ? 'success' : 'secondary'}>
+                        {article.status}
+                      </Badge>
+                    </td>
+                    <td className="p-3 text-muted small">
+                      <div className="d-flex align-items-center gap-3">
+                        <span title="Views">
+                          <FontAwesomeIcon icon={faEye} className="me-1" />
+                          {article.views ?? 0}
+                        </span>
+                        <span title="Likes">
+                          <FontAwesomeIcon icon={faHeart} className="me-1 text-danger" />
+                          {article.likes ?? 0}
+                        </span>
+                        <span title="Comments">
+                          <FontAwesomeIcon icon={faComment} className="me-1" />
+                          {article.comments?.length ?? 0}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-muted">
+                      {new Date(article.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="p-3 text-end">
+                      <Link 
+                        href={`/admin/article/${article._id}`} 
+                        className="btn btn-sm btn-outline-primary me-2"
+                      >
+                        Edit
+                      </Link>
+                      <Button 
+                        variant="outline-danger" 
+                        size="sm"
+                        onClick={() => handleDelete(article._id)}
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </Table>
           {articles.length === 0 && (

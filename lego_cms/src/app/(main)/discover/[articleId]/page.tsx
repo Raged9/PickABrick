@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation'; 
 import { Container, Row, Col, Badge, Button, Spinner, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faUser, faArrowLeft, faEye, faHeart, faComment } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faUser, faArrowLeft, faEye, faHeart, faComment, faVideo, faPlay } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
+import VideoThumbnailPlayer, { getYouTubeVideoId, isDirectVideoFile, isArticleVideo } from '@/component/VideoThumbnailPlayer';
 
 interface ArticleComment {
   _id?: string;
@@ -22,6 +23,8 @@ interface Article {
   content: string;
   category: string;
   thumbnail: string;
+  videoUrl?: string;
+  mediaType?: 'image' | 'video';
   createdAt: string;
   views?: number;
   likes?: number;
@@ -44,8 +47,8 @@ export default function ArticleDetailPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-  const getImageUrl = (path: string) => {
-    if (!path) return '/images/placeholder-product.png';
+  const getMediaUrl = (path: string) => {
+    if (!path) return '';
     if (path.startsWith('http')) return path;
     return `${BASE_URL}${path.replace(/\\/g, '/')}`;
   };
@@ -143,12 +146,17 @@ export default function ArticleDetailPage() {
           className="btn btn-dark rounded-pill px-4"
           style={{ textDecoration: 'none' }}
         >
-        <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+          <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
           Back to Discover
         </Link>
       </Container>
     );
   }
+
+  const isVideo = isArticleVideo(article);
+  const coverUrl = getMediaUrl(article.thumbnail);
+  const effectiveVideoUrl = article.videoUrl || (isDirectVideoFile(coverUrl) ? coverUrl : '');
+  const ytId = effectiveVideoUrl ? getYouTubeVideoId(effectiveVideoUrl) : null;
 
   return (
     <main>
@@ -163,9 +171,16 @@ export default function ArticleDetailPage() {
               </Link>
 
               <header className="mb-5">
-                <Badge bg="warning" text="dark" className="mb-3 px-3 py-2 rounded-pill">
-                  {article.category}
-                </Badge>
+                <div className="d-flex align-items-center gap-2 mb-3">
+                  <Badge bg="warning" text="dark" className="px-3 py-2 rounded-pill">
+                    {article.category}
+                  </Badge>
+                  {isVideo && (
+                    <Badge bg="danger" className="px-3 py-2 rounded-pill d-flex align-items-center gap-1">
+                      <FontAwesomeIcon icon={faVideo} /> Video Article
+                    </Badge>
+                  )}
+                </div>
                 
                 <h1 className="fw-bold display-5 mb-4">{article.title}</h1>
                 
@@ -209,19 +224,41 @@ export default function ArticleDetailPage() {
                 </div>
               </header>
 
-              <div className="position-relative w-100 mb-5 rounded-4 overflow-hidden shadow-sm" style={{ aspectRatio: '16/9' }}>
-                <Image
-                  src={getImageUrl(article.thumbnail)}
-                  alt={article.title}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  priority
-                />
+              {/* MEDIA PLAYER / THUMBNAIL SECTION */}
+              <div className="position-relative w-100 mb-5 rounded-4 overflow-hidden shadow-sm" style={{ aspectRatio: '16/9', backgroundColor: '#000' }}>
+                {isVideo && effectiveVideoUrl ? (
+                  ytId ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${ytId}?rel=0`}
+                      title={article.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      style={{ width: '100%', height: '100%', border: 'none' }}
+                    />
+                  ) : (
+                    <video
+                      src={effectiveVideoUrl}
+                      poster={coverUrl || undefined}
+                      controls
+                      playsInline
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  )
+                ) : (
+                  <Image
+                    src={coverUrl || '/images/placeholder-product.png'}
+                    alt={article.title}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    priority
+                  />
+                )}
               </div>
 
               <div 
                 className="article-content fs-5 lh-lg text-dark"
-
                 style={{ whiteSpace: 'pre-wrap', color: '#333' }}
               >
                 {article.content}
